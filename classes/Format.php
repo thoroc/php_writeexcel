@@ -24,7 +24,7 @@
  * Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
  */
 
-class writeexcel_format {
+class Format {
 
     var $_xf_index;
     var $_font_index;
@@ -63,7 +63,7 @@ class writeexcel_format {
     /*
      * Constructor
      */
-    function writeexcel_format() {
+    function Format() {
         $_=func_get_args();
 
         $this->_xf_index       = (sizeof($_)>0) ? array_shift($_) : 0;
