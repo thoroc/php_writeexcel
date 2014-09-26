@@ -589,7 +589,7 @@ class Workbook extends BIFFWriter
     {
         # _tmp_format is added by new(). We use this to write the default XF's
         $format = $this->_tmp_format;
-        $font = $format->get_font();
+        $font = $format->getFont();
 
         # Note: Fonts are 0-indexed. According to the SDK there is no index 4,
         # so the following fonts are 0, 1, 2, 3, 5
@@ -604,27 +604,27 @@ class Workbook extends BIFFWriter
         #
     $index = 6;                  # The first user defined FONT
 
-        $key = $format->get_font_key(); # The default font from _tmp_format
+        $key = $format->getFontKey(); # The default font from _tmp_format
         $fonts[$key] = 0;               # Index of the default font
 
         for( $c = 0; $c < sizeof( $this->_formats ); $c++ )
         {
             $format = &$this->_formats[$c];
 
-            $key = $format->get_font_key();
+            $key = $format->getFontKey();
 
             if( isset( $fonts[$key] ) )
             {
                 # FONT has already been used
-                $format->_font_index = $fonts[$key];
+                $format->fontIndex = $fonts[$key];
             }
             else
             {
                 # Add a new FONT record
                 $fonts[$key] = $index;
-                $format->_font_index = $index;
+                $format->fontIndex = $index;
                 $index++;
-                $font = $format->get_font();
+                $font = $format->getFont();
                 $this->_append( $font );
             }
         }
@@ -651,7 +651,7 @@ class Workbook extends BIFFWriter
         {
             $format = &$this->_formats[$c];
 
-            $num_format = $format->_num_format;
+            $num_format = $format->numFormat;
 
             # Check if $num_format is an index to a built-in format.
             # Also check for a string of zeros, which is a valid format string
@@ -669,13 +669,13 @@ class Workbook extends BIFFWriter
             if( isset( $num_formats[$num_format] ) )
             {
                 # FORMAT has already been used
-                $format->_num_format = $num_formats[$num_format];
+                $format->numFormat = $num_formats[$num_format];
             }
             else
             {
                 # Add a new FORMAT
                 $num_formats[$num_format] = $index;
-                $format->_num_format = $index;
+                $format->numFormat = $index;
                 array_push( $num_formats_list, $num_format );
                 $index++;
             }
@@ -706,17 +706,17 @@ class Workbook extends BIFFWriter
 
         for( $c = 0; $c < 15; $c++ )
         {
-            $xf = $format->get_xf( 'style' ); # Style XF
+            $xf = $format->getXf( 'style' ); # Style XF
             $this->_append( $xf );
         }
 
-        $xf = $format->get_xf( 'cell' );      # Cell XF
+        $xf = $format->getXf( 'cell' );      # Cell XF
         $this->_append( $xf );
 
         # User defined XFs
         foreach( $this->_formats as $format )
         {
-            $xf = $format->get_xf( 'cell' );
+            $xf = $format->getXf( 'cell' );
             $this->_append( $xf );
         }
     }

@@ -32,14 +32,14 @@ $worksheet4->thaw_panes( 12.75, 8.43, 1, 1 ); # 1 row and column
 #
 
 $header = & $workbook->addformat();
-$header->set_color( 'white' );
-$header->set_align( 'center' );
-$header->set_align( 'vcenter' );
-$header->set_pattern();
-$header->set_fg_color( 'green' );
+$header->setColor( 'white' );
+$header->setAlign( 'center' );
+$header->setAlign( 'vcenter' );
+$header->setPattern();
+$header->setFgColor( 'green' );
 
 $center = & $workbook->addformat();
-$center->set_align( 'center' );
+$center->setAlign( 'center' );
 
 
 #######################################################################

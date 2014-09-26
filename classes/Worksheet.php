@@ -951,15 +951,15 @@ class Worksheet extends BIFFWriter
 
         if( $format )
         {
-            return $format->get_xf_index();
+            return $format->getXfIndex();
         }
         elseif( isset( $this->_row_formats[$row] ) )
         {
-            return $this->_row_formats[$row]->get_xf_index();
+            return $this->_row_formats[$row]->getXfIndex();
         }
         elseif( isset( $this->_col_formats[$col] ) )
         {
-            return $this->_col_formats[$col]->get_xf_index();
+            return $this->_col_formats[$col]->getXfIndex();
         }
         else
         {
@@ -2058,7 +2058,7 @@ class Worksheet extends BIFFWriter
         # Check for a format object
         if( isset( $_[2] ) )
         {
-            $ixfe = $format->get_xf_index();
+            $ixfe = $format->getXfIndex();
         }
         else
         {
@@ -2202,7 +2202,7 @@ class Worksheet extends BIFFWriter
         # Check for a format object
         if( isset( $_[3] ) )
         {
-            $ixfe = $format->get_xf_index();
+            $ixfe = $format->getXfIndex();
         }
         else
         {

@@ -13,19 +13,19 @@ $worksheet->set_column( 0, 3, 15 );
 
 # Create a format for the column headings
 $header = & $workbook->addformat();
-$header->set_bold();
-$header->set_size( 12 );
-$header->set_color( 'blue' );
+$header->setBold();
+$header->setSize( 12 );
+$header->setColor( 'blue' );
 
 # Create a format for the stock price
 $f_price = & $workbook->addformat();
-$f_price->set_align( 'left' );
-$f_price->set_num_format( '$0.00' );
+$f_price->setAlign( 'left' );
+$f_price->setNumFormat( '$0.00' );
 
 # Create a format for the stock volume
 $f_volume = & $workbook->addformat();
-$f_volume->set_align( 'left' );
-$f_volume->set_num_format( '#,##0' );
+$f_volume->setAlign( 'left' );
+$f_volume->setNumFormat( '#,##0' );
 
 # Create a format for the price change. This is an example of a conditional
 # format. The number is formatted as a percentage. If it is positive it is
@@ -35,8 +35,8 @@ $f_volume->set_num_format( '#,##0' );
 # [Color 10] instead for a dark green.
 #
 $f_change = & $workbook->addformat();
-$f_change->set_align( 'left' );
-$f_change->set_num_format( '[Green]0.0%;[Red]-0.0%;0.0%' );
+$f_change->setAlign( 'left' );
+$f_change->setNumFormat( '[Green]0.0%;[Red]-0.0%;0.0%' );
 
 # Write out the data
 $worksheet->write( 0, 0, 'Company', $header );

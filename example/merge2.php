@@ -16,32 +16,32 @@ $worksheet->set_row( 2, 30 );
 
 # Create a border format
 $border1 = & $workbook->addformat();
-$border1->set_color( 'white' );
-$border1->set_bold();
-$border1->set_size( 15 );
-$border1->set_pattern( 0x1 );
-$border1->set_fg_color( 'green' );
-$border1->set_border_color( 'yellow' );
-$border1->set_top( 6 );
-$border1->set_bottom( 6 );
-$border1->set_left( 6 );
-$border1->set_align( 'center' );
-$border1->set_align( 'vcenter' );
-$border1->set_merge(); # This is the key feature
+$border1->setColor( 'white' );
+$border1->setBold();
+$border1->setSize( 15 );
+$border1->setPattern( 0x1 );
+$border1->setFgColor( 'green' );
+$border1->setBorderColor( 'yellow' );
+$border1->setTop( 6 );
+$border1->setBottom( 6 );
+$border1->setLeft( 6 );
+$border1->setAlign( 'center' );
+$border1->setAlign( 'vcenter' );
+$border1->setMerge(); # This is the key feature
 # Create another border format. Note you could use copy() here.
 $border2 = & $workbook->addformat();
-$border2->set_color( 'white' );
-$border2->set_bold();
-$border2->set_size( 15 );
-$border2->set_pattern( 0x1 );
-$border2->set_fg_color( 'green' );
-$border2->set_border_color( 'yellow' );
-$border2->set_top( 6 );
-$border2->set_bottom( 6 );
-$border2->set_right( 6 );
-$border2->set_align( 'center' );
-$border2->set_align( 'vcenter' );
-$border2->set_merge(); # This is the key feature
+$border2->setColor( 'white' );
+$border2->setBold();
+$border2->setSize( 15 );
+$border2->setPattern( 0x1 );
+$border2->setFgColor( 'green' );
+$border2->setBorderColor( 'yellow' );
+$border2->setTop( 6 );
+$border2->setBottom( 6 );
+$border2->setRight( 6 );
+$border2->setAlign( 'center' );
+$border2->setAlign( 'vcenter' );
+$border2->setMerge(); # This is the key feature
 # Only one cell should contain text, the others should be blank.
 $worksheet->write( 2, 1, "Merged Cells", $border1 );
 $worksheet->write_blank( 2, 2, $border2 );

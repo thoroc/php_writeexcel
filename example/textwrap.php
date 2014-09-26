@@ -29,18 +29,18 @@ $str2 .= "it's always ourselves\nwe find in the sea";
 
 # Create a format for the column headings
 $header = & $workbook->addformat();
-$header->set_bold();
-$header->set_font( "Courier New" );
-$header->set_align( 'center' );
-$header->set_align( 'vcenter' );
+$header->setBold();
+$header->setFont( "Courier New" );
+$header->setAlign( 'center' );
+$header->setAlign( 'vcenter' );
 
 # Create a "vertical justification" format
 $format1 = & $workbook->addformat();
-$format1->set_align( 'vjustify' );
+$format1->setAlign( 'vjustify' );
 
 # Create a "text wrap" format
 $format2 = & $workbook->addformat();
-$format2->set_text_wrap();
+$format2->setTextWrap();
 
 # Write the headers
 $worksheet->write( 0, 1, "set_align('vjustify')", $header );
