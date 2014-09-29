@@ -18,55 +18,55 @@
  * Suite 330, Boston, MA  02111-1307 USA
  */
 
-/*
+namespace writeexcel\classes;
+
+/**
  * This is the Spreadsheet::WriteExcel Perl package ported to PHP
  * Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
  */
-
 class OLEWriter
 {
-    var $_OLEfilename;
-    var $_OLEtmpfilename; /* ABR */
-    var $_filehandle;
-    var $_fileclosed;
-    var $_internal_fh;
-    var $_biff_only;
-    var $_size_allowed;
-    var $_biffsize;
-    var $_booksize;
-    var $_big_blocks;
-    var $_list_blocks;
-    var $_root_start;
-    var $_block_count;
-    /*
+    var $OLEfilename;
+    var $OLEtmpfilename; /* ABR */
+    var $fileHandle;
+    var $fileClosed;
+    var $internalFileHandle;
+    var $BIFFOnly;
+    var $sizeAllowed;
+    var $BIFFSize;
+    var $bookSize;
+    var $bigBlocks;
+    var $listBlocks;
+    var $rootStart;
+    var $blockCount;
+
+    /**
      * Constructor
      */
-
-    function OLEWriter( $filename )
+    public function __construct( $filename )
     {
+        $this->OLEfilename = $filename;
+        $this->fileHandle = false;
+        $this->fileClosed = 0;
+        $this->internalFileHandle = 0;
+        $this->BIFFOnly = 0;
+        $this->sizeAllowed = 0;
+        $this->BIFFSize = 0;
+        $this->bookSize = 0;
+        $this->bigBlocks = 0;
+        $this->listBlocks = 0;
+        $this->rootStart = 0;
+        $this->blockCount = 4;
 
-        $this->_OLEfilename = $filename;
-        $this->_filehandle = false;
-        $this->_fileclosed = 0;
-        $this->_internal_fh = 0;
-        $this->_biff_only = 0;
-        $this->_size_allowed = 0;
-        $this->_biffsize = 0;
-        $this->_booksize = 0;
-        $this->_big_blocks = 0;
-        $this->_list_blocks = 0;
-        $this->_root_start = 0;
-        $this->_block_count = 4;
-
-        $this->_initialize();
+        $this->initialize();
     }
     /*
      * Check for a valid filename and store the filehandle.
      */
 
-    function _initialize()
+    function initialize()
     {
-        $OLEfile = $this->_OLEfilename;
+        $OLEfile = $this->OLEfilename;
 
         /* Check for a filename. Workbook.pm will catch this first. */
         if( $OLEfile == '' )
@@ -94,21 +94,21 @@ class OLEWriter
                         "protected", E_USER_ERROR );
             }
 
-            $this->_internal_fh = 1;
+            $this->internalFileHandle = 1;
         }
 
         // Store filehandle
-        $this->_filehandle = $fh;
+        $this->fileHandle = $fh;
     }
-    /*
+
+    /**
      * Set the size of the data to be written to the OLE stream
      *
      * $big_blocks = (109 depot block x (128 -1 marker word)
      *               - (1 x end words)) = 13842
      * $maxsize    = $big_blocks * 512 bytes = 7087104
      */
-
-    function set_size( $size )
+    public function setSize( $size )
     {
         $maxsize = 7087104;
 
@@ -117,112 +117,112 @@ class OLEWriter
             trigger_error( "Maximum file size, $maxsize, exceeded. To create " .
                     "files bigger than this limit please use the " .
                     "workbookbig class.", E_USER_ERROR );
-            return ($this->_size_allowed = 0);
+            return ($this->sizeAllowed = 0);
         }
 
-        $this->_biffsize = $size;
+        $this->BIFFSize = $size;
 
         // Set the min file size to 4k to avoid having to use small blocks
         if( $size > 4096 )
         {
-            $this->_booksize = $size;
+            $this->bookSize = $size;
         }
         else
         {
-            $this->_booksize = 4096;
+            $this->bookSize = 4096;
         }
 
-        return ($this->_size_allowed = 1);
+        return ($this->sizeAllowed = 1);
     }
-    /*
+
+    /**
      * Calculate various sizes needed for the OLE stream
      */
-
-    function _calculate_sizes()
+    public function calculateSizes()
     {
-        $datasize = $this->_booksize;
+        $datasize = $this->bookSize;
 
         if( $datasize % 512 == 0 )
         {
-            $this->_big_blocks = $datasize / 512;
+            $this->bigBlocks = $datasize / 512;
         }
         else
         {
-            $this->_big_blocks = floor( $datasize / 512 ) + 1;
+            $this->bigBlocks = floor( $datasize / 512 ) + 1;
         }
         // There are 127 list blocks and 1 marker blocks for each big block
         // depot + 1 end of chain block
-        $this->_list_blocks = floor( ($this->_big_blocks) / 127 ) + 1;
-        $this->_root_start = $this->_big_blocks;
+        $this->listBlocks = floor( ($this->bigBlocks) / 127 ) + 1;
+        $this->rootStart = $this->bigBlocks;
 
         //print $this->_biffsize.    "\n";
         //print $this->_big_blocks.  "\n";
         //print $this->_list_blocks. "\n";
     }
-    /*
+
+    /**
      * Write root entry, big block list and close the filehandle.
      * This method must be called so that the file contents are
      * actually written.
      */
-
-    function close()
+    public function close()
     {
 
-        if( !$this->_size_allowed )
+        if( !$this->sizeAllowed )
         {
             return;
         }
 
-        if( !$this->_biff_only )
+        if( !$this->BIFFOnly )
         {
-            $this->_write_padding();
-            $this->_write_property_storage();
-            $this->_write_big_block_depot();
+            $this->writePadding();
+            $this->writePropertyStorage();
+            $this->writeBigBlockDepot();
         }
 
         // Close the filehandle if it was created internally.
-        if( $this->_internal_fh )
+        if( $this->internalFileHandle )
         {
-            fclose( $this->_filehandle );
+            fclose( $this->fileHandle );
         }
         /* ABR */
-        if( $this->_OLEtmpfilename != '' )
+        if( $this->OLEtmpfilename != '' )
         {
-            $fh = fopen( $this->_OLEtmpfilename, "rb" );
+            $fh = fopen( $this->OLEtmpfilename, "rb" );
             if( $fh == false )
             {
                 trigger_error( "Can't read temporary file.", E_USER_ERROR );
             }
             fpassthru( $fh );
             fclose( $fh );
-            unlink( $this->_OLEtmpfilename );
+            unlink( $this->OLEtmpfilename );
         };
 
-        $this->_fileclosed = 1;
+        $this->fileClosed = 1;
     }
-    /*
+
+    /**
      * Write BIFF data to OLE file.
      */
-
-    function write( $data )
+    public function write( $data )
     {
-        fputs( $this->_filehandle, $data );
+        fputs( $this->fileHandle, $data );
     }
-    /*
+
+    /**
      * Write OLE header block.
      */
-
-    function write_header()
+    public function writeHeader()
     {
-        if( $this->_biff_only )
+        if( $this->BIFFOnly )
         {
             return;
         }
 
-        $this->_calculate_sizes();
+        $this->calculateSizes();
 
-        $root_start = $this->_root_start;
-        $num_lists = $this->_list_blocks;
+        $root_start = $this->rootStart;
+        $num_lists = $this->listBlocks;
 
         $id = pack( "C8", 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1 );
         $unknown1 = pack( "VVVV", 0x00, 0x00, 0x00, 0x00 );
@@ -237,82 +237,83 @@ class OLEWriter
         $unknown7 = pack( "VVV", 0x00, -2, 0x00 );
         $unused = pack( "V", -1 );
 
-        fputs( $this->_filehandle, $id );
-        fputs( $this->_filehandle, $unknown1 );
-        fputs( $this->_filehandle, $unknown2 );
-        fputs( $this->_filehandle, $unknown3 );
-        fputs( $this->_filehandle, $unknown4 );
-        fputs( $this->_filehandle, $unknown5 );
-        fputs( $this->_filehandle, $num_bbd_blocks );
-        fputs( $this->_filehandle, $root_startblock );
-        fputs( $this->_filehandle, $unknown6 );
-        fputs( $this->_filehandle, $sbd_startblock );
-        fputs( $this->_filehandle, $unknown7 );
+        fputs( $this->fileHandle, $id );
+        fputs( $this->fileHandle, $unknown1 );
+        fputs( $this->fileHandle, $unknown2 );
+        fputs( $this->fileHandle, $unknown3 );
+        fputs( $this->fileHandle, $unknown4 );
+        fputs( $this->fileHandle, $unknown5 );
+        fputs( $this->fileHandle, $num_bbd_blocks );
+        fputs( $this->fileHandle, $root_startblock );
+        fputs( $this->fileHandle, $unknown6 );
+        fputs( $this->fileHandle, $sbd_startblock );
+        fputs( $this->fileHandle, $unknown7 );
 
         for( $c = 1; $c <= $num_lists; $c++ )
         {
             $root_start++;
-            fputs( $this->_filehandle, pack( "V", $root_start ) );
+            fputs( $this->fileHandle, pack( "V", $root_start ) );
         }
 
         for( $c = $num_lists; $c <= 108; $c++ )
         {
-            fputs( $this->_filehandle, $unused );
+            fputs( $this->fileHandle, $unused );
         }
     }
-    /*
+
+    /**
      * Write big block depot.
      */
-
-    function _write_big_block_depot()
+    function writeBigBlockDepot()
     {
-        $num_blocks = $this->_big_blocks;
-        $num_lists = $this->_list_blocks;
-        $total_blocks = $num_lists * 128;
-        $used_blocks = $num_blocks + $num_lists + 2;
+        $numBlocks = $this->bigBlocks;
+        $numLists = $this->listBlocks;
+        $totalBlocks = $numLists * 128;
+        $usedBlocks = $numBlocks + $numLists + 2;
 
         $marker = pack( "V", -3 );
-        $end_of_chain = pack( "V", -2 );
+        $endOfChain = pack( "V", -2 );
         $unused = pack( "V", -1 );
 
-        for( $i = 1; $i <= ($num_blocks - 1); $i++ )
+        for( $i = 1; $i <= ($numBlocks - 1); $i++ )
         {
-            fputs( $this->_filehandle, pack( "V", $i ) );
+            fputs( $this->fileHandle, pack( "V", $i ) );
         }
 
-        fputs( $this->_filehandle, $end_of_chain );
-        fputs( $this->_filehandle, $end_of_chain );
+        fputs( $this->fileHandle, $endOfChain );
+        fputs( $this->fileHandle, $endOfChain );
 
-        for( $c = 1; $c <= $num_lists; $c++ )
+        for( $c = 1; $c <= $numLists; $c++ )
         {
-            fputs( $this->_filehandle, $marker );
+            fputs( $this->fileHandle, $marker );
         }
 
-        for( $c = $used_blocks; $c <= $total_blocks; $c++ )
+        for( $c = $usedBlocks; $c <= $totalBlocks; $c++ )
         {
-            fputs( $this->_filehandle, $unused );
+            fputs( $this->fileHandle, $unused );
         }
     }
-    /*
-     * Write property storage. TODO: add summary sheets
-     */
 
-    function _write_property_storage()
+    /**
+     * Write property storage.
+     * @todo add summary sheets
+     */
+    public function writePropertyStorage()
     {
         $rootsize = -2;
-        $booksize = $this->_booksize;
+        $booksize = $this->bookSize;
 
         //                name          type  dir start  size
-        $this->_write_pps( 'Root Entry', 0x05, 1, -2, 0x00 );
-        $this->_write_pps( 'Book', 0x02, -1, 0x00, $booksize );
-        $this->_write_pps( '', 0x00, -1, 0x00, 0x0000 );
-        $this->_write_pps( '', 0x00, -1, 0x00, 0x0000 );
+        $this->writePPS( 'Root Entry', 0x05, 1, -2, 0x00 );
+        $this->writePPS( 'Book', 0x02, -1, 0x00, $booksize );
+        $this->writePPS( '', 0x00, -1, 0x00, 0x0000 );
+        $this->writePPS( '', 0x00, -1, 0x00, 0x0000 );
     }
-    /*
+
+    /**
      * Write property sheet in property storage
      */
-
-    function _write_pps( $name, $type, $dir, $start, $size )
+    private function writePPS( $name, $type, $dir, $start, $size )
     {
         $names = array();
         $length = 0;
@@ -347,45 +348,43 @@ class OLEWriter
         $pps_sb = pack( "V", $start );    //0x74
         $pps_size = pack( "V", $size );     //0x78
 
-        fputs( $this->_filehandle, $rawname );
-        fputs( $this->_filehandle, str_repeat( $zero, (64 - $length ) ) );
-        fputs( $this->_filehandle, $pps_sizeofname );
-        fputs( $this->_filehandle, $pps_type );
-        fputs( $this->_filehandle, $pps_prev );
-        fputs( $this->_filehandle, $pps_next );
-        fputs( $this->_filehandle, $pps_dir );
-        fputs( $this->_filehandle, str_repeat( $unknown1, 5 ) );
-        fputs( $this->_filehandle, $pps_ts1s );
-        fputs( $this->_filehandle, $pps_ts1d );
-        fputs( $this->_filehandle, $pps_ts2d );
-        fputs( $this->_filehandle, $pps_ts2d );
-        fputs( $this->_filehandle, $pps_sb );
-        fputs( $this->_filehandle, $pps_size );
-        fputs( $this->_filehandle, $unknown1 );
+        fputs( $this->fileHandle, $rawname );
+        fputs( $this->fileHandle, str_repeat( $zero, (64 - $length ) ) );
+        fputs( $this->fileHandle, $pps_sizeofname );
+        fputs( $this->fileHandle, $pps_type );
+        fputs( $this->fileHandle, $pps_prev );
+        fputs( $this->fileHandle, $pps_next );
+        fputs( $this->fileHandle, $pps_dir );
+        fputs( $this->fileHandle, str_repeat( $unknown1, 5 ) );
+        fputs( $this->fileHandle, $pps_ts1s );
+        fputs( $this->fileHandle, $pps_ts1d );
+        fputs( $this->fileHandle, $pps_ts2d );
+        fputs( $this->fileHandle, $pps_ts2d );
+        fputs( $this->fileHandle, $pps_sb );
+        fputs( $this->fileHandle, $pps_size );
+        fputs( $this->fileHandle, $unknown1 );
     }
-    /*
+
+    /**
      * Pad the end of the file
      */
-
-    function _write_padding()
+    private function writePadding()
     {
-        $biffsize = $this->_biffsize;
+        $BIFFsize = $this->BIFFSize;
 
-        if( $biffsize < 4096 )
+        if( $BIFFsize < 4096 )
         {
-            $min_size = 4096;
+            $minSize = 4096;
         }
         else
         {
-            $min_size = 512;
+            $minSize = 512;
         }
 
-        if( $biffsize % $min_size != 0 )
+        if( $BIFFsize % $minSize != 0 )
         {
-            $padding = $min_size - ($biffsize % $min_size);
-            fputs( $this->_filehandle, str_repeat( "\0", $padding ) );
+            $padding = $minSize - ($BIFFsize % $minSize);
+            fputs( $this->fileHandle, str_repeat( "\0", $padding ) );
         }
     }
 }
-
-?>

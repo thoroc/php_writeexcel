@@ -521,18 +521,18 @@ class Workbook extends BIFFWriter
         if( $this->_tmpfilename != '' )
         {
             $OLE = new OLEWriter( '/tmp/' . $this->_tmpfilename );
-            $OLE->_OLEtmpfilename = '/tmp/' . $this->_tmpfilename;
+            $OLE->OLEtmpfilename = '/tmp/' . $this->_tmpfilename;
         }
         else
         {
             $OLE = new OLEWriter( $this->_filename );
-            $OLE->_OLEtmpfilename = '';
+            $OLE->OLEtmpfilename = '';
         };
 ## END ABR
         # Write Worksheet data if data <~ 7MB
-        if( $OLE->set_size( $this->_biffsize ) )
+        if( $OLE->setSize( $this->_biffsize ) )
         {
-            $OLE->write_header();
+            $OLE->writeHeader();
             $OLE->write( $this->_data );
 
             for( $c = 0; $c < sizeof( $this->_worksheets ); $c++ )
