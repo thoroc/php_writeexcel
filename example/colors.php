@@ -42,7 +42,7 @@ $colors = array(
     'yellow' => 0x0D
 );
 
-$worksheet1 = & $workbook->addworksheet( 'Named colors' );
+$worksheet1 = & $workbook->addWorksheet( 'Named colors' );
 
 $worksheet1->set_column( 0, 3, 15 );
 
@@ -74,7 +74,7 @@ foreach( $colors as $color => $index )
 # Demonstrate the standard Excel colors in the range 8..63.
 #
 
-$worksheet2 = & $workbook->addworksheet( 'Standard colors' );
+$worksheet2 = & $workbook->addWorksheet( 'Standard colors' );
 
 $worksheet2->set_column( 0, 3, 15 );
 

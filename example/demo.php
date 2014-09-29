@@ -6,9 +6,9 @@ require_once "../class/Worksheet.inc.php";
 
 $fname = tempnam( "/tmp", "demo.xls" );
 $workbook = & new Workbook( $fname );
-$worksheet = & $workbook->addworksheet( 'Demo' );
-$worksheet2 = & $workbook->addworksheet( 'Another sheet' );
-$worksheet3 = & $workbook->addworksheet( 'And another' );
+$worksheet = & $workbook->addWorksheet( 'Demo' );
+$worksheet2 = & $workbook->addWorksheet( 'Another sheet' );
+$worksheet3 = & $workbook->addWorksheet( 'And another' );
 
 #######################################################################
 #

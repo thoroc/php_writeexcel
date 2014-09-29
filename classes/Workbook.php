@@ -18,37 +18,39 @@
  * Suite 330, Boston, MA  02111-1307 USA
  */
 
+namespace writeexcel\classes;
+
 /*
  * This is the Spreadsheet::WriteExcel Perl package ported to PHP
  * Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
  */
 
-require_once "class.writeexcel_biffwriter.inc.php";
-require_once "class.writeexcel_format.inc.php";
-require_once "class.writeexcel_formula.inc.php";
-require_once "class.writeexcel_olewriter.inc.php";
+require_once "BIFFwriter.php";
+require_once "format.php";
+require_once "Formula.php";
+require_once "OLEWriter.php";
 
 class Workbook extends BIFFWriter
 {
-    var $_filename;
-    var $_tmpfilename;
-    var $_parser;
-    var $_tempdir;
-    var $_1904;
-    var $_activesheet;
-    var $_firstsheet;
-    var $_selected;
-    var $_xf_index;
-    var $_fileclosed;
-    var $_biffsize;
-    var $_sheetname;
-    var $_tmp_format;
-    var $_url_format;
-    var $_codepage;
-    var $_worksheets;
-    var $_sheetnames;
-    var $_formats;
-    var $_palette;
+    var $filename;
+    var $tmpFilename;
+    var $parser;
+    var $tempDir;
+    var $sysStartDate;
+    var $activeSheet;
+    var $firstSheet;
+    var $selected;
+    var $xfIndex;
+    var $fileClosed;
+    var $BIFFSize;
+    var $sheetName;
+    var $tmpFormat;
+    var $urlFormat;
+    var $codePage;
+    var $worksheets;
+    var $sheetNames;
+    var $formats;
+    var $palette;
 ###############################################################################
 #
 # new()
@@ -56,39 +58,38 @@ class Workbook extends BIFFWriter
 # Constructor. Creates a new Workbook object from a BIFFwriter object.
 #
 
-    function Workbook( $filename )
+    public function __construct( $filename )
     {
-
         $this->writeexcel_biffwriter();
 
         $tmp_format = new Format();
         $byte_order = $this->_byte_order;
         $parser = new Formula( $byte_order );
 
-        $this->_filename = $filename;
-        $this->_parser = $parser;
+        $this->filename = $filename;
+        $this->parser = $parser;
 //?    $this->_tempdir           = undef;
-        $this->_1904 = 0;
-        $this->_activesheet = 0;
-        $this->_firstsheet = 0;
-        $this->_selected = 0;
-        $this->_xf_index = 16; # 15 style XF's and 1 cell XF.
-        $this->_fileclosed = 0;
-        $this->_biffsize = 0;
-        $this->_sheetname = "Sheet";
-        $this->_tmp_format = $tmp_format;
-        $this->_url_format = false;
-        $this->_codepage = 0x04E4;
-        $this->_worksheets = array();
-        $this->_sheetnames = array();
-        $this->_formats = array();
-        $this->_palette = array();
+        $this->sysStartDate = 0;
+        $this->activeSheet = 0;
+        $this->firstSheet = 0;
+        $this->selected = 0;
+        $this->xfIndex = 16; # 15 style XF's and 1 cell XF.
+        $this->fileClosed = 0;
+        $this->BIFFSize = 0;
+        $this->sheetName = "Sheet";
+        $this->tmpFormat = $tmp_format;
+        $this->urlFormat = false;
+        $this->codePage = 0x04E4;
+        $this->worksheets = array();
+        $this->sheetNames = array();
+        $this->formats = array();
+        $this->palette = array();
 
         # Add the default format for hyperlinks
-        $this->_url_format = & $this->addformat( array( 'color' => 'blue', 'underline' => 1 ) );
+        $this->urlFormat = & $this->addformat( array( 'color' => 'blue', 'underline' => 1 ) );
 
         # Check for a filename
-        if( $this->_filename == '' )
+        if( $this->filename == '' )
         {
 //todo: print error
             return;
@@ -100,72 +101,63 @@ class Workbook extends BIFFWriter
         #
 //todo
         # Set colour palette.
-        $this->set_palette_xl97();
+        $this->setPaletteExcel97();
     }
-###############################################################################
-#
-# close()
-#
-# Calls finalization methods and explicitly close the OLEwriter file
-# handle.
-#
 
-    function close()
+    /**
+     * Calls finalization methods and explicitly close the OLEwriter file handle.
+     */
+    public function close()
     {
         # Prevent close() from being called twice.
-        if( $this->_fileclosed )
+        if( $this->fileClosed )
         {
             return;
         }
 
         $this->_store_workbook();
-        $this->_fileclosed = 1;
+        $this->fileClosed = 1;
     }
 
 //PHPport: method DESTROY deleted
-###############################################################################
-#
-# sheets()
-#
-# An accessor for the _worksheets[] array
-#
-# Returns: a list of the worksheet objects in a workbook
-#
-    function &sheets()
+    /**
+     * An accessor for the _worksheets[] array
+     *
+     * @return array a list of the worksheet objects in a workbook
+     */
+    public function &sheets()
     {
-        return $this->_worksheets;
+        return $this->worksheets;
     }
 
 //PHPport: method worksheets deleted:
-# This method is now deprecated. Use the sheets() method instead.
-###############################################################################
-#
-# addworksheet($name)
-#
-# Add a new worksheet to the Excel workbook.
-# TODO: Add accessor for $self->{_sheetname} for international Excel versions.
-#
-# Returns: reference to a worksheet object
-#
-    function &addworksheet( $name = "" )
+    /**
+     * @deprecated This method is now deprecated. Use the sheets() method instead.
+     *
+     * Add a new worksheet to the Excel workbook.
+     *
+     * @todo Add accessor for $self->{_sheetname} for international Excel versions.
+     * @param string $name
+     * @return \writeexcel\classes\Worksheet reference to a worksheet object
+     */
+    public function &addWorksheet( $name = "" )
     {
-
         # Check that sheetname is <= 31 chars (Excel limit).
         if( strlen( $name ) > 31 )
         {
             trigger_error( "Sheetname $name must be <= 31 chars", E_USER_ERROR );
         }
 
-        $index = sizeof( $this->_worksheets );
-        $sheetname = $this->_sheetname;
+        $index = sizeof( $this->worksheets );
+        $sheetName = $this->sheetName;
 
         if( $name == "" )
         {
-            $name = $sheetname . ($index + 1);
+            $name = $sheetName . ($index + 1);
         }
 
         # Check that the worksheet name doesn't already exist: a fatal Excel error.
-        foreach( $this->_worksheets as $tmp )
+        foreach( $this->worksheets as $tmp )
         {
             if( $name == $tmp->get_name() )
             {
@@ -173,68 +165,69 @@ class Workbook extends BIFFWriter
             }
         }
 
-        $worksheet = & new Worksheet( $name, $index, $this->_activesheet, $this->_firstsheet, $this->_url_format, $this->_parser, $this->_tempdir );
+        $worksheet = & new Worksheet( $name, $index, $this->activeSheet, $this->firstSheet, $this->urlFormat, $this->parser, $this->tempDir );
 
-        $this->_worksheets[$index] = &$worksheet;    # Store ref for iterator
-        $this->_sheetnames[$index] = $name;         # Store EXTERNSHEET names
-        $this->_parser->set_ext_sheet( $name, $index ); # Store names in Formula.pm
+        $this->worksheets[$index] = &$worksheet;    # Store ref for iterator
+        $this->sheetNames[$index] = $name;         # Store EXTERNSHEET names
+        $this->parser->set_ext_sheet( $name, $index ); # Store names in Formula.pm
         return $worksheet;
     }
-###############################################################################
-#
-# addformat(%properties)
-#
-# Add a new format to the Excel workbook. This adds an XF record and
-# a FONT record. Also, pass any properties to the Format::new().
-#
 
+    /**
+     * Add a new format to the Excel workbook. This adds an XF record and a
+     * FONT record. Also, pass any properties to the Format::new().
+     *
+     * @param bool $para
+     * @return \writeexcel\classes\Format
+     */
     function &addformat( $para = false )
     {
         if( $para === false )
         {
-            $format = & new Format( $this->_xf_index );
+            $format = & new Format( $this->xfIndex );
         }
         else
         {
-            $format = & new Format( $this->_xf_index, $para );
+            $format = & new Format( $this->xfIndex, $para );
         }
 
-        $this->_xf_index += 1;
+        $this->xfIndex += 1;
         # Store format reference
-        $this->_formats[] = &$format;
+        $this->formats[] = &$format;
 
         return $format;
     }
-###############################################################################
-#
-# set_1904()
-#
-# Set the date system: 0 = 1900 (the default), 1 = 1904
-#
 
-    function set_1904( $_1904 )
+    /**
+     * Set the date system: 0 = 1900 (the default), 1 = 1904
+     *
+     * @param int $startDate
+     */
+    public function setSysStartDate( $startDate )
     {
-        $this->_1904 = $_1904;
+        $this->sysStartDate = $startDate;
     }
-###############################################################################
-#
-# get_1904()
-#
-# Return the date system: 0 = 1900, 1 = 1904
-#
 
-    function get_1904()
+    /**
+     * Return the date system: 0 = 1900, 1 = 1904
+     *
+     * @return int
+     */
+    public function getSysStartDate()
     {
-        return $this->_1904;
+        return $this->sysStartDate;
     }
-###############################################################################
-#
-# set_custom_color()
-#
-# Change the RGB components of the elements in the colour palette.
-#
 
-    function set_custom_color( $index, $red, $green, $blue )
+    /**
+     * Change the RGB components of the elements in the colour palette.
+     *
+     * @param int $index
+     * @param int $red
+     * @param int $green
+     * @param int $blue
+     * @return type
+     */
+    public function setCustomColor( $index, $red, $green, $blue )
     {
 // todo
         /*
@@ -244,7 +237,7 @@ class Workbook extends BIFFWriter
           }
          */
 
-        $aref = &$this->_palette;
+        $aref = &$this->palette;
 
         # Check that the colour index is the right range
         if( $index < 8 or $index > 64 )
@@ -268,16 +261,15 @@ class Workbook extends BIFFWriter
 
         return $index + 8;
     }
-###############################################################################
-#
-# set_palette_xl97()
-#
-# Sets the colour palette to the Excel 97+ default.
-#
 
-    function set_palette_xl97()
+    /**
+     * Sets the colour palette to the Excel 97+ default.
+     *
+     * @return int
+     */
+    public function setPaletteExcel97()
     {
-        $this->_palette = array(
+        $this->palette = array(
             array( 0x00, 0x00, 0x00, 0x00 ), # 8
             array( 0xff, 0xff, 0xff, 0x00 ), # 9
             array( 0xff, 0x00, 0x00, 0x00 ), # 10
@@ -338,16 +330,15 @@ class Workbook extends BIFFWriter
 
         return 0;
     }
-###############################################################################
-#
-# set_palette_xl5()
-#
-# Sets the colour palette to the Excel 5 default.
-#
 
-    function set_palette_xl5()
+    /**
+     * Sets the colour palette to the Excel 5 default.
+     *
+     * @return int
+     */
+    public function setPaletteExcel5()
     {
-        $this->_palette = array(
+        $this->palette = array(
             array( 0x00, 0x00, 0x00, 0x00 ), # 8
             array( 0xff, 0xff, 0xff, 0x00 ), # 9
             array( 0xff, 0x00, 0x00, 0x00 ), # 10
@@ -408,14 +399,13 @@ class Workbook extends BIFFWriter
 
         return 0;
     }
-###############################################################################
-#
-# set_tempdir()
-#
-# Change the default temp directory used by _initialize() in Worksheet.pm.
-#
 
-    function set_tempdir( $tempdir )
+    /**
+     * Change the default temp directory used by initialize() in Worksheet.pm.
+     *
+     * @param string $tempdir
+     */
+    public function setTempDir( $tempdir )
     {
 //todo
         /*
@@ -423,22 +413,20 @@ class Workbook extends BIFFWriter
           croak "set_tempdir must be called before addworksheet" if $self->sheets();
          */
 
-        $this->_tempdir = $tempdir;
+        $this->tempDir = $tempdir;
     }
-###############################################################################
-#
-# set_codepage()
-#
-# See also the _store_codepage method. This is used to store the code page, i.e.
-# the character set used in the workbook.
-#
 
-    function set_codepage( $cp )
+    /**
+     * See also the _store_codepage method. This is used to store the code page,
+     * i.e. the character set used in the workbook.
+     *
+     * @param type $codePage
+     */
+    function setCodePage( $codePage )
     {
-
-        if( $cp == 1 ) $codepage = 0x04E4;
-        else if( $cp == 2 ) $codepage = 0x8000;
-        if( $codepage ) $this->_codepage = $codepage;
+        if( $codePage == 1 ) $code = 0x04E4;
+        else if( $codePage == 2 ) $code = 0x8000;
+        if( $code ) $this->codePage = $code;
     }
 ###############################################################################
 #
@@ -452,21 +440,21 @@ class Workbook extends BIFFWriter
     {
 
         # Ensure that at least one worksheet has been selected.
-        if( $this->_activesheet == 0 )
+        if( $this->activeSheet == 0 )
         {
-            $this->_worksheets[0]->_selected = 1;
+            $this->worksheets[0]->selected = 1;
         }
 
         # Calculate the number of selected worksheet tabs and call the finalization
         # methods for each worksheet
-        for( $c = 0; $c < sizeof( $this->_worksheets ); $c++ )
+        for( $c = 0; $c < sizeof( $this->worksheets ); $c++ )
         {
-            $sheet = &$this->_worksheets[$c];
-            if( $sheet->_selected )
+            $sheet = &$this->worksheets[$c];
+            if( $sheet->selected )
             {
-                $this->_selected++;
+                $this->selected++;
             }
-            $sheet->_close( $this->_sheetnames );
+            $sheet->_close( $this->sheetNames );
         }
 
         # Add Workbook globals
@@ -495,9 +483,9 @@ class Workbook extends BIFFWriter
         $this->_calc_sheet_offsets();
 
         # Add BOUNDSHEET records
-        for( $c = 0; $c < sizeof( $this->_worksheets ); $c++ )
+        for( $c = 0; $c < sizeof( $this->worksheets ); $c++ )
         {
-            $sheet = &$this->_worksheets[$c];
+            $sheet = &$this->worksheets[$c];
             $this->_store_boundsheet( $sheet->_name, $sheet->_offset );
         }
 
@@ -518,26 +506,26 @@ class Workbook extends BIFFWriter
     function _store_OLE_file()
     {
 ## ABR
-        if( $this->_tmpfilename != '' )
+        if( $this->tmpFilename != '' )
         {
-            $OLE = new OLEWriter( '/tmp/' . $this->_tmpfilename );
-            $OLE->OLEtmpfilename = '/tmp/' . $this->_tmpfilename;
+            $OLE = new OLEWriter( '/tmp/' . $this->tmpFilename );
+            $OLE->OLEtmpfilename = '/tmp/' . $this->tmpFilename;
         }
         else
         {
-            $OLE = new OLEWriter( $this->_filename );
+            $OLE = new OLEWriter( $this->filename );
             $OLE->OLEtmpfilename = '';
         };
 ## END ABR
         # Write Worksheet data if data <~ 7MB
-        if( $OLE->setSize( $this->_biffsize ) )
+        if( $OLE->setSize( $this->BIFFSize ) )
         {
             $OLE->writeHeader();
             $OLE->write( $this->_data );
 
-            for( $c = 0; $c < sizeof( $this->_worksheets ); $c++ )
+            for( $c = 0; $c < sizeof( $this->worksheets ); $c++ )
             {
-                $sheet = &$this->_worksheets[$c];
+                $sheet = &$this->worksheets[$c];
                 while( $tmp = $sheet->get_data() )
                 {
                     $OLE->write( $tmp );
@@ -562,21 +550,21 @@ class Workbook extends BIFFWriter
         $EOF = 4;
         $offset = $this->_datasize;
 
-        foreach( $this->_worksheets as $sheet )
+        foreach( $this->worksheets as $sheet )
         {
             $offset += $BOF + strlen( $sheet->_name );
         }
 
         $offset += $EOF;
 
-        for( $c = 0; $c < sizeof( $this->_worksheets ); $c++ )
+        for( $c = 0; $c < sizeof( $this->worksheets ); $c++ )
         {
-            $sheet = &$this->_worksheets[$c];
+            $sheet = &$this->worksheets[$c];
             $sheet->_offset = $offset;
             $offset += $sheet->_datasize;
         }
 
-        $this->_biffsize = $offset;
+        $this->BIFFSize = $offset;
     }
 ###############################################################################
 #
@@ -588,7 +576,7 @@ class Workbook extends BIFFWriter
     function _store_all_fonts()
     {
         # _tmp_format is added by new(). We use this to write the default XF's
-        $format = $this->_tmp_format;
+        $format = $this->tmpFormat;
         $font = $format->getFont();
 
         # Note: Fonts are 0-indexed. According to the SDK there is no index 4,
@@ -607,9 +595,9 @@ class Workbook extends BIFFWriter
         $key = $format->getFontKey(); # The default font from _tmp_format
         $fonts[$key] = 0;               # Index of the default font
 
-        for( $c = 0; $c < sizeof( $this->_formats ); $c++ )
+        for( $c = 0; $c < sizeof( $this->formats ); $c++ )
         {
-            $format = &$this->_formats[$c];
+            $format = &$this->formats[$c];
 
             $key = $format->getFontKey();
 
@@ -647,9 +635,9 @@ class Workbook extends BIFFWriter
         # built-in format type and if the FORMAT string hasn't already been used.
         #
 
-    for( $c = 0; $c < sizeof( $this->_formats ); $c++ )
+    for( $c = 0; $c < sizeof( $this->formats ); $c++ )
         {
-            $format = &$this->_formats[$c];
+            $format = &$this->formats[$c];
 
             $num_format = $format->numFormat;
 
@@ -701,7 +689,7 @@ class Workbook extends BIFFWriter
         # _tmp_format is added by new(). We use this to write the default XF's
         # The default font index is 0
         #
-    $format = $this->_tmp_format;
+    $format = $this->tmpFormat;
         $xf;
 
         for( $c = 0; $c < 15; $c++ )
@@ -714,7 +702,7 @@ class Workbook extends BIFFWriter
         $this->_append( $xf );
 
         # User defined XFs
-        foreach( $this->_formats as $format )
+        foreach( $this->formats as $format )
         {
             $xf = $format->getXf( 'cell' );
             $this->_append( $xf );
@@ -743,10 +731,10 @@ class Workbook extends BIFFWriter
     {
 
         # Create EXTERNCOUNT with number of worksheets
-        $this->_store_externcount( sizeof( $this->_worksheets ) );
+        $this->_store_externcount( sizeof( $this->worksheets ) );
 
         # Create EXTERNSHEET for each worksheet
-        foreach( $this->_sheetnames as $sheetname )
+        foreach( $this->sheetNames as $sheetname )
         {
             $this->_store_externsheet( $sheetname );
         }
@@ -762,7 +750,7 @@ class Workbook extends BIFFWriter
     {
 
         # Create the print area NAME records
-        foreach( $this->_worksheets as $worksheet )
+        foreach( $this->worksheets as $worksheet )
         {
             # Write a Name record if the print area has been defined
             if( $worksheet->_print_rowmin !== false )
@@ -775,7 +763,7 @@ class Workbook extends BIFFWriter
         }
 
         # Create the print title NAME records
-        foreach( $this->_worksheets as $worksheet )
+        foreach( $this->worksheets as $worksheet )
         {
 
             $rowmin = $worksheet->_title_rowmin;
@@ -841,11 +829,11 @@ class Workbook extends BIFFWriter
         $dyWn = 0x1572;                 # Height of window
 
         $grbit = 0x0038;                 # Option flags
-        $ctabsel = $this->_selected;     # Number of workbook tabs selected
+        $ctabsel = $this->selected;     # Number of workbook tabs selected
         $wTabRatio = 0x0258;                 # Tab to scrollbar ratio
 
-        $itabFirst = $this->_firstsheet;   # 1st displayed worksheet
-        $itabCur = $this->_activesheet;  # Active worksheet
+        $itabFirst = $this->firstSheet;   # 1st displayed worksheet
+        $itabCur = $this->activeSheet;  # Active worksheet
 
         $header = pack( "vv", $record, $length );
         $data = pack( "vvvvvvvvv", $xWn, $yWn, $dxWn, $dyWn, $grbit, $itabCur, $itabFirst, $ctabsel, $wTabRatio );
@@ -927,7 +915,7 @@ class Workbook extends BIFFWriter
         $record = 0x0022;         # Record identifier
         $length = 0x0002;         # Bytes to follow
 
-        $f1904 = $this->_1904; # Flag for 1904 date system
+        $f1904 = $this->sysStartDate; # Flag for 1904 date system
 
         $header = pack( "vv", $record, $length );
         $data = pack( "v", $f1904 );
@@ -1153,7 +1141,7 @@ class Workbook extends BIFFWriter
 
     function _store_palette()
     {
-        $aref = &$this->_palette;
+        $aref = &$this->palette;
 
         $record = 0x0092;                  # Record identifier
         $length = 2 + 4 * sizeof( $aref );   # Number of bytes to follow
@@ -1181,7 +1169,7 @@ class Workbook extends BIFFWriter
 
         $record = 0x0042;               # Record identifier
         $length = 0x0002;               # Number of bytes to follow
-        $cv = $this->_codepage;     # The code page
+        $cv = $this->codePage;     # The code page
 
         $header = pack( "vv", $record, $length );
         $data = pack( "v", $cv );

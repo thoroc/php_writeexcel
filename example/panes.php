@@ -12,10 +12,10 @@ require_once "../class/Worksheet.php";
 $fname = tempnam( "/tmp", "panes.xls" );
 $workbook = &new writeexcel_workbook( $fname );
 
-$worksheet1 = & $workbook->addworksheet( 'Panes 1' );
-$worksheet2 = & $workbook->addworksheet( 'Panes 2' );
-$worksheet3 = & $workbook->addworksheet( 'Panes 3' );
-$worksheet4 = & $workbook->addworksheet( 'Panes 4' );
+$worksheet1 = & $workbook->addWorksheet( 'Panes 1' );
+$worksheet2 = & $workbook->addWorksheet( 'Panes 2' );
+$worksheet3 = & $workbook->addWorksheet( 'Panes 3' );
+$worksheet4 = & $workbook->addWorksheet( 'Panes 4' );
 
 # Frozen panes
 $worksheet1->freeze_panes( 1, 0 ); # 1 row

@@ -4,7 +4,7 @@ require_once "../class/Worksheet.inc.php";
 
 $fname = tempnam( "/tmp", "textwrap.xls" );
 $workbook = &new Workbook( $fname );
-$worksheet = &$workbook->addworksheet();
+$worksheet = &$workbook->addWorksheet();
 
 # Set the column width for columns 1, 2 and 3
 $worksheet->set_column( 1, 1, 24 );

@@ -6,7 +6,7 @@ require_once "../class/Worksheet.inc.php";
 
 $fname = tempnam( "/tmp", "stocks.xls" );
 $workbook = &new Workbook( $fname );
-$worksheet = & $workbook->addworksheet();
+$worksheet = & $workbook->addWorksheet();
 
 # Set the column width for columns 1, 2, 3 and 4
 $worksheet->set_column( 0, 3, 15 );

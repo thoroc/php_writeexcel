@@ -6,7 +6,7 @@ require_once "../class/Worksheet.inc.php";
 
 $fname = tempnam( "/tmp", "simple.xls" );
 $workbook = &new Workbook( $fname );
-$worksheet = &$workbook->addworksheet();
+$worksheet = &$workbook->addWorksheet();
 
 # The general syntax is write($row, $column, $token). Note that row and
 # column are zero indexed

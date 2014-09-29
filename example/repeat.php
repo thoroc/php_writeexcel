@@ -6,7 +6,7 @@ require_once "../class/Worksheet.inc.php";
 
 $fname = tempnam( "/tmp", "repeat.xls" );
 $workbook = &new Workbook( $fname );
-$worksheet = &$workbook->addworksheet();
+$worksheet = &$workbook->addWorksheet();
 
 $worksheet->repeat_rows( 0, 1 );
 
