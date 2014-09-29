@@ -645,15 +645,15 @@ class Format
     }
     /* Undocumented */
 
-    public function setFontFamily( $font_family = 1 )
+    public function setFontFamily( $fontFamily = 1 )
     {
-        $this->fontFamily = $font_family;
+        $this->fontFamily = $fontFamily;
     }
     /* Undocumented */
 
-    public function setFontCharset( $font_charset = 1 )
+    public function setFontCharset( $fontCharset = 1 )
     {
-        $this->fontCharset = $font_charset;
+        $this->fontCharset = $fontCharset;
     }
 
     public function setNumFormat( $num_format = 1 )
@@ -716,7 +716,7 @@ class Format
         $this->bottom = $bottom;
     }
 
-    public public function setTop( $top = 1 )
+    public function setTop( $top = 1 )
     {
         $this->top = $top;
     }
