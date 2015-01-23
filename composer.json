@@ -1,0 +1,37 @@
+{
+"name": "thoroc/php_writeexcel",
+"type": "library",
+"description": "Powerful library to write excel files",
+"keywords": ["excel", "spreadsheet", "document", "xls", "writer"],
+"homepage": "https://github.com/thoroc/php_writeexcel",
+"repositories": [
+{
+"type": "vcs",
+"url": "https://github.com/thoroc/php_writeexcel.git"
+}
+],
+"license": "LGPL v2.1",
+"authors": [
+{
+"name": "Johann Hanne",
+"email": "none@example.com",
+"homepage": "https://github.com/thoroc/",
+"role": "Developer"
+}
+],
+"require": {
+"php": ">=5.3.0"
+},
+"autoload": {
+"psr-0": {
+"writeexcel_biffwriter": "./",
+"writeexcel_format": "./",
+"writeexcel_formula": "./",
+"writeexcel_olewriter": "./",
+"writeexcel_workbookbig": "./",
+"writeexcel_workbook": "./",
+"writeexcel_worksheet": "./"
+
+}
+}
+}
