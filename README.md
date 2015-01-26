@@ -9,6 +9,7 @@ Johann Hanne's php lib to write excel file
 Example for your `composer.json` file:
 
 ```
+{
     "minimum-stability": "dev",
     "repositories": [
       {
@@ -18,4 +19,6 @@ Example for your `composer.json` file:
     ],
     "require": {
         "thoroc/php_writeexcel": "master",
+    }
+}
 ```
