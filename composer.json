@@ -14,8 +14,8 @@
     "authors": [
         {
             "name": "Johann Hanne",
-            "email": "none@example.com",
-            "homepage": "https://github.com/thoroc/",
+            "email": "jonny@1409.org",
+            "homepage": "http://www.bettina-attack.de/jonny/view.php/projects/php_writeexcel/",
             "role": "Developer"
         }
     ],
@@ -29,6 +29,7 @@
             "class.writeexcel_format.inc.php",
             "class.writeexcel_formula.inc.php",
             "class.writeexcel_olewriter.inc.php",
+            "class.writeexcel_workbookbig.inc.php",
             "class.writeexcel_workbook.inc.php",
             "class.writeexcel_worksheet.inc.php"
         ]
