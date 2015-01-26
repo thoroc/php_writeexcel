@@ -24,13 +24,13 @@
 },
 "autoload": {
 "psr-0": {
-"writeexcel_biffwriter": "./",
-"writeexcel_format": "./",
-"writeexcel_formula": "./",
-"writeexcel_olewriter": "./",
-"writeexcel_workbookbig": "./",
-"writeexcel_workbook": "./",
-"writeexcel_worksheet": "./"
+"writeexcel_biffwriter": "./class.writeexcel_biffwriter.inc.php",
+"writeexcel_format": "./class.writeexcel_format.inc.php",
+"writeexcel_formula": "./class.writeexcel_formula.inc.php",
+"writeexcel_olewriter": "./class.writeexcel_olewriter.inc.php",
+"writeexcel_workbookbig": "./class.writeexcel_workbookbig.inc.php",
+"writeexcel_workbook": "./class.writeexcel_workbook.inc.php",
+"writeexcel_worksheet": "./class.writeexcel_worksheet.inc.php"
 
 }
 }
