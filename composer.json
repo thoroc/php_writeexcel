@@ -30,7 +30,7 @@
             "class.writeexcel_formula.inc.php",
             "class.writeexcel_olewriter.inc.php",
             "class.writeexcel_workbook.inc.php",
-            "/class.writeexcel_worksheet.inc.php"
+            "class.writeexcel_worksheet.inc.php"
         ]
     }
 }
