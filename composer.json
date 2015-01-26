@@ -1,37 +1,37 @@
 {
-"name": "thoroc/php_writeexcel",
-"type": "library",
-"description": "Powerful library to write excel files",
-"keywords": ["excel", "spreadsheet", "document", "xls", "writer"],
-"homepage": "https://github.com/thoroc/php_writeexcel",
-"repositories": [
-{
-"type": "vcs",
-"url": "https://github.com/thoroc/php_writeexcel.git"
-}
-],
-"license": "LGPL v2.1",
-"authors": [
-{
-"name": "Johann Hanne",
-"email": "none@example.com",
-"homepage": "https://github.com/thoroc/",
-"role": "Developer"
-}
-],
-"require": {
-"php": ">=5.3.0"
-},
-"autoload": {
-"psr-0": {
-"writeexcel_biffwriter": "./class.writeexcel_biffwriter.inc.php",
-"writeexcel_format": "./class.writeexcel_format.inc.php",
-"writeexcel_formula": "./class.writeexcel_formula.inc.php",
-"writeexcel_olewriter": "./class.writeexcel_olewriter.inc.php",
-"writeexcel_workbookbig": "./class.writeexcel_workbookbig.inc.php",
-"writeexcel_workbook": "./class.writeexcel_workbook.inc.php",
-"writeexcel_worksheet": "./class.writeexcel_worksheet.inc.php"
-
-}
-}
+    "name": "thoroc/php_writeexcel",
+    "type": "library",
+    "description": "Powerful library to write excel files",
+    "keywords": ["excel", "spreadsheet", "document", "xls", "writer"],
+    "homepage": "https://github.com/thoroc/php_writeexcel",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/thoroc/php_writeexcel.git"
+        }
+    ],
+    "license": "LGPL v2.1",
+    "authors": [
+        {
+            "name": "Johann Hanne",
+            "email": "none@example.com",
+            "homepage": "https://github.com/thoroc/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "psr-0": { },
+        "files": [
+            "class.writeexcel_biffwriter.inc.php",
+            "class.writeexcel_format.inc.php",
+            "class.writeexcel_formula.inc.php",
+            "class.writeexcel_olewriter.inc.php",
+            "class.writeexcel_workbookbig.inc.php",
+            "class.writeexcel_workbook.inc.php",
+            "/class.writeexcel_worksheet.inc.php"
+        ]
+    }
 }
