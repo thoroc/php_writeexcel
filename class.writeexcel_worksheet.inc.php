@@ -113,7 +113,11 @@ class writeexcel_worksheet extends writeexcel_biffwriter {
 
         $rowmax                   = 65536; // 16384 in Excel 5
         $colmax                   = 256;
-        $strmax                   = 255;
+        //$strmax                   = 255;
+        // Ignore Excel 5 compatibility, and allow 32k of text in a cell
+        // source : http://blog.adin.pro/2013-03-13/writeexcel-php-max-size-255/
+        $strmax                   = 32767;
+
 
         $this->_name              = $name;
         $this->_index             = $index;
