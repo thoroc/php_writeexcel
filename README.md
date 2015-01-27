@@ -31,3 +31,13 @@ Example for your `composer.json` file:
 }
 ```
 
+Original Documentation
+======================
+
+ * [README](doc/README)
+ * [LICENSE](doc/LICENSE)
+ * [FAQ](doc/FAQ)
+ * [TODO](doc/TODO)
+ * [CONTRIBUTION](doc/THANKS)
+ * [CHANGELGO](doc/CHANGELOG)
+
