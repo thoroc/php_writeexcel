@@ -141,7 +141,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$this->_xf_index		= 16; # 15 style XF's and 1 cell XF.
 		$this->_fileclosed		= 0;
 		$this->_biffsize		= 0;
-		$this->_sheetname		= "Sheet";
+		$this->_sheetname		= 'Sheet';
 		$this->_tmp_format		= $tmp_format;
 		$this->_url_format		= false;
 		$this->_codepage		= 0x04E4;
@@ -270,7 +270,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	#
 	# Returns: reference to a worksheet object
 	#
-	function &addworksheet($name="") {
+	function &addworksheet($name='') {
 
 		# Check that sheetname is <= 31 chars (Excel limit).
 		if (strlen($name) > 31) {
@@ -280,7 +280,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$index	= sizeof($this->_worksheets);
 		$sheetname = $this->_sheetname;
 
-		if ($name == "") {
+		if ($name == '') {
 			$name = $sheetname . ($index+1);
 		}
 
@@ -930,8 +930,8 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$itabFirst = $this->_firstsheet;	# 1st displayed worksheet
 		$itabCur	= $this->_activesheet;  # Active worksheet
 
-		$header	= pack("vv",		$record, $length);
-		$data	= pack("vvvvvvvvv", $xWn, $yWn, $dxWn, $dyWn,
+		$header	= pack('vv',		$record, $length);
+		$data	= pack('vvvvvvvvv', $xWn, $yWn, $dxWn, $dyWn,
 									$grbit,
 									$itabCur, $itabFirst,
 									$ctabsel, $wTabRatio);
@@ -954,8 +954,8 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$grbit	= 0x0000;			# Sheet identifier
 		$cch	= strlen($sheetname);	# Length of sheet name
 
-		$header	= pack("vv",  $record, $length);
-		$data	= pack("VvC", $offset, $grbit, $cch);
+		$header	= pack('vv',  $record, $length);
+		$data	= pack('VvC', $offset, $grbit, $cch);
 
 		$this->_append($header . $data . $sheetname);
 	}
@@ -974,8 +974,8 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$BuiltIn	= 0x00;	# Built-in style
 		$iLevel	= 0xff;	# Outline style level
 
-		$header	= pack("vv",  $record, $length);
-		$data	= pack("vCC", $ixfe, $BuiltIn, $iLevel);
+		$header	= pack('vv',  $record, $length);
+		$data	= pack('vCC', $ixfe, $BuiltIn, $iLevel);
 
 		$this->_append($header . $data);
 	}
@@ -994,8 +994,8 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$ifmt	= $index;				# Format index code
 		$cch	= strlen($format);		# Length of format string
 
-		$header	= pack("vv", $record, $length);
-		$data	= pack("vC", $ifmt, $cch);
+		$header	= pack('vv', $record, $length);
+		$data	= pack('vC', $ifmt, $cch);
 
 		$this->_append($header . $data . $format);
 	}
@@ -1012,8 +1012,8 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 
 		$f1904	= $this->_1904; # Flag for 1904 date system
 
-		$header	= pack("vv",  $record, $length);
-		$data	= pack("v", $f1904);
+		$header	= pack('vv',  $record, $length);
+		$data	= pack('v', $f1904);
 
 		$this->_append($header . $data);
 	}
@@ -1037,8 +1037,8 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 
 		$cxals	= $par0;		# Number of external references
 
-		$header	= pack("vv", $record, $length);
-		$data	= pack("v",  $cxals);
+		$header	= pack('vv', $record, $length);
+		$data	= pack('v',  $cxals);
 
 		$this->_append($header . $data);
 	}
@@ -1062,8 +1062,8 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$cch		= strlen($sheetname);	# Length of sheet name
 		$rgch		= 0x03;				# Filename encoding
 
-		$header	= pack("vv",  $record, $length);
-		$data	= pack("CC", $cch, $rgch);
+		$header	= pack('vv',  $record, $length);
+		$data	= pack('CC', $cch, $rgch);
 
 		$this->_append($header . $data . $sheetname);
 	}
@@ -1107,30 +1107,30 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$colmin		= $par4;		# Start column
 		$colmax		= $par5;		# end column
 
-		$header	= pack("vv",  $record, $length);
-		$data	= pack("v", $grbit);
-		$data	.= pack("C", $chKey);
-		$data	.= pack("C", $cch);
-		$data	.= pack("v", $cce);
-		$data	.= pack("v", $ixals);
-		$data	.= pack("v", $itab);
-		$data	.= pack("C", $cchCustMenu);
-		$data	.= pack("C", $cchDescription);
-		$data	.= pack("C", $cchHelptopic);
-		$data	.= pack("C", $cchStatustext);
-		$data	.= pack("C", $rgch);
-		$data	.= pack("C", $unknown03);
-		$data	.= pack("v", $unknown04);
-		$data	.= pack("v", $unknown05);
-		$data	.= pack("v", $unknown06);
-		$data	.= pack("v", $unknown07);
-		$data	.= pack("v", $unknown08);
-		$data	.= pack("v", $index);
-		$data	.= pack("v", $index);
-		$data	.= pack("v", $rowmin);
-		$data	.= pack("v", $rowmax);
-		$data	.= pack("C", $colmin);
-		$data	.= pack("C", $colmax);
+		$header	= pack('vv',  $record, $length);
+		$data	= pack('v', $grbit);
+		$data	.= pack('C', $chKey);
+		$data	.= pack('C', $cch);
+		$data	.= pack('v', $cce);
+		$data	.= pack('v', $ixals);
+		$data	.= pack('v', $itab);
+		$data	.= pack('C', $cchCustMenu);
+		$data	.= pack('C', $cchDescription);
+		$data	.= pack('C', $cchHelptopic);
+		$data	.= pack('C', $cchStatustext);
+		$data	.= pack('C', $rgch);
+		$data	.= pack('C', $unknown03);
+		$data	.= pack('v', $unknown04);
+		$data	.= pack('v', $unknown05);
+		$data	.= pack('v', $unknown06);
+		$data	.= pack('v', $unknown07);
+		$data	.= pack('v', $unknown08);
+		$data	.= pack('v', $index);
+		$data	.= pack('v', $index);
+		$data	.= pack('v', $rowmin);
+		$data	.= pack('v', $rowmax);
+		$data	.= pack('C', $colmin);
+		$data	.= pack('C', $colmax);
 
 		$this->_append($header . $data);
 	}
@@ -1178,48 +1178,48 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$colmin		= $par4;		# Start column
 		$colmax		= $par5;		# end column
 
-		$header		= pack("vv",  $record, $length);
-		$data			= pack("v", $grbit);
-		$data			.= pack("C", $chKey);
-		$data			.= pack("C", $cch);
-		$data			.= pack("v", $cce);
-		$data			.= pack("v", $ixals);
-		$data			.= pack("v", $itab);
-		$data			.= pack("C", $cchCustMenu);
-		$data			.= pack("C", $cchDescription);
-		$data			.= pack("C", $cchHelptopic);
-		$data			.= pack("C", $cchStatustext);
-		$data			.= pack("C", $rgch);
-		$data			.= pack("C", $unknown01);
-		$data			.= pack("v", $unknown02);
+		$header	= pack('vv',  $record, $length);
+		$data	= pack('v', $grbit);
+		$data	.= pack('C', $chKey);
+		$data	.= pack('C', $cch);
+		$data	.= pack('v', $cce);
+		$data	.= pack('v', $ixals);
+		$data	.= pack('v', $itab);
+		$data	.= pack('C', $cchCustMenu);
+		$data	.= pack('C', $cchDescription);
+		$data	.= pack('C', $cchHelptopic);
+		$data	.= pack('C', $cchStatustext);
+		$data	.= pack('C', $rgch);
+		$data	.= pack('C', $unknown01);
+		$data	.= pack('v', $unknown02);
 		# Column definition
-		$data			.= pack("C", $unknown03);
-		$data			.= pack("v", $unknown04);
-		$data			.= pack("v", $unknown05);
-		$data			.= pack("v", $unknown06);
-		$data			.= pack("v", $unknown07);
-		$data			.= pack("v", $unknown08);
-		$data			.= pack("v", $index);
-		$data			.= pack("v", $index);
-		$data			.= pack("v", 0x0000);
-		$data			.= pack("v", 0x3fff);
-		$data			.= pack("C", $colmin);
-		$data			.= pack("C", $colmax);
+		$data	.= pack('C', $unknown03);
+		$data	.= pack('v', $unknown04);
+		$data	.= pack('v', $unknown05);
+		$data	.= pack('v', $unknown06);
+		$data	.= pack('v', $unknown07);
+		$data	.= pack('v', $unknown08);
+		$data	.= pack('v', $index);
+		$data	.= pack('v', $index);
+		$data	.= pack('v', 0x0000);
+		$data	.= pack('v', 0x3fff);
+		$data	.= pack('C', $colmin);
+		$data	.= pack('C', $colmax);
 		# Row definition
-		$data			.= pack("C", $unknown03);
-		$data			.= pack("v", $unknown04);
-		$data			.= pack("v", $unknown05);
-		$data			.= pack("v", $unknown06);
-		$data			.= pack("v", $unknown07);
-		$data			.= pack("v", $unknown08);
-		$data			.= pack("v", $index);
-		$data			.= pack("v", $index);
-		$data			.= pack("v", $rowmin);
-		$data			.= pack("v", $rowmax);
-		$data			.= pack("C", 0x00);
-		$data			.= pack("C", 0xff);
+		$data	.= pack('C', $unknown03);
+		$data	.= pack('v', $unknown04);
+		$data	.= pack('v', $unknown05);
+		$data	.= pack('v', $unknown06);
+		$data	.= pack('v', $unknown07);
+		$data	.= pack('v', $unknown08);
+		$data	.= pack('v', $index);
+		$data	.= pack('v', $index);
+		$data	.= pack('v', $rowmin);
+		$data	.= pack('v', $rowmax);
+		$data	.= pack('C', 0x00);
+		$data	.= pack('C', 0xff);
 		# End of data
-		$data			.= pack("C", 0x10);
+		$data	.= pack('C', 0x10);
 
 		$this->_append($header . $data);
 	}
@@ -1244,7 +1244,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 			$data .= call_user_func_array('pack', array_merge(array('CCCC'), $dat));
 		}
 
-		$header = pack("vvv",  $record, $length, $ccv);
+		$header = pack('vvv',  $record, $length, $ccv);
 
 		$this->_append($header . $data);
 	}
@@ -1261,8 +1261,8 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$length		= 0x0002;			# Number of bytes to follow
 		$cv			= $this->_codepage;	# The code page
 
-		$header		= pack("vv", $record, $length);
-		$data		= pack("v",  $cv);
+		$header		= pack('vv', $record, $length);
+		$data		= pack('v',  $cv);
 
 		$this->_append($header.$data);
 	}
