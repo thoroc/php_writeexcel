@@ -23,17 +23,6 @@
 * Copyleft 2002 Johann Hanne
 */
 
-/*
-* Modified for compatibility with PEAR's Spreadsheet_Excel_Writer, as far as I need.
-* Modified constructor to allow associative array of options, including optional filename.
-* Replace spaces with 4 space wide tabs.
-* Fix warnings.
-* Add property scopes.
-* Require worksheet class here so that caller doesn't have to do it.
-*
-* Copyright 2015 Craig Manley
-*/
-
 require_once('class.writeexcel_biffwriter.inc.php');
 require_once('class.writeexcel_format.inc.php');
 require_once('class.writeexcel_formula.inc.php');
