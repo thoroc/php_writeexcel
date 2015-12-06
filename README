@@ -115,16 +115,3 @@ Syntax different from SpreadSheet::WriteExcel
 ---------------------------------------------
 The worksheet methods set_h_pagebreaks() and set_v_pagebreaks() take
 exactly one argument which must be an array with the desired page breaks.
-
-
-
-Perfomance comparison (added by Craig Manley, 2015-12-06)
----------------------------------------------------------
-Writing a table of 8 fields and 950 rows to an Excel file resulted in these average elapsed times:
-PHPExcel: 7.417
-PEAR Spreadsheet_Excel_Writer: 1.078
-php_writeexcel: 2.065
-
-So clearly, PEAR's Spreadsheet_Excel_Writer is almost twice as fast.
-PHPExcel more modern, but by far the slowest and consumes huge amounts of memory,
-which is the only reason I tried with this library, updating it slightly in the process.
