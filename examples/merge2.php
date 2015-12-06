@@ -2,10 +2,10 @@
 
 set_time_limit(10);
 
-require_once "class.writeexcel_workbook.inc.php";
-require_once "class.writeexcel_worksheet.inc.php";
+require_once('../class.writeexcel_workbook.inc.php');
+require_once('../class.writeexcel_worksheet.inc.php');
 
-$fname = tempnam("/tmp", "merge2.xls");
+$fname = tempnam(sys_get_temp_dir(), "merge2.xls");
 $workbook = &new writeexcel_workbook($fname);
 $worksheet = &$workbook->addworksheet();
 
@@ -56,5 +56,3 @@ header("Content-Disposition: inline; filename=\"example-merge2.xls\"");
 $fh=fopen($fname, "rb");
 fpassthru($fh);
 unlink($fname);
-
-?>

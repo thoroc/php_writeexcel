@@ -1,9 +1,9 @@
 <?php
 
-require_once "class.writeexcel_workbook.inc.php";
-require_once "class.writeexcel_worksheet.inc.php";
+require_once('../class.writeexcel_workbook.inc.php');
+require_once('../class.writeexcel_worksheet.inc.php');
 
-$fname = tempnam("/tmp", "textwrap.xls");
+$fname = tempnam(sys_get_temp_dir(), "textwrap.xls");
 $workbook = &new writeexcel_workbook($fname);
 $worksheet = &$workbook->addworksheet();
 
@@ -68,5 +68,3 @@ header("Content-Disposition: inline; filename=\"example-textwrap.xls\"");
 $fh=fopen($fname, "rb");
 fpassthru($fh);
 unlink($fname);
-
-?>

@@ -8,10 +8,10 @@
 
 set_time_limit(10);
 
-require_once "class.writeexcel_workbook.inc.php";
-require_once "class.writeexcel_worksheet.inc.php";
+require_once('../class.writeexcel_workbook.inc.php');
+require_once('../class.writeexcel_worksheet.inc.php');
 
-$fname = tempnam("/tmp", "panes.xls");
+$fname = tempnam(sys_get_temp_dir(), "panes.xls");
 $workbook = &new writeexcel_workbook($fname);
 
 $worksheet1 =& $workbook->addworksheet('Panes 1');
@@ -140,5 +140,3 @@ header("Content-Disposition: inline; filename=\"example-panes.xls\"");
 $fh=fopen($fname, "rb");
 fpassthru($fh);
 unlink($fname);
-
-?>
