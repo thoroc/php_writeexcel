@@ -10,8 +10,11 @@
 -	Workbook: add toString() method to return the workbook binary data as a string.
 -	Modified to act as a drop-in compatible replacement for PEAR's Spreadsheet_Excel_Writer, as far as I need:
 	*	format: make setting fonts with set_properties() compatible with PEAR's Spreadsheet_Excel_Writer.
-	*	workbook: add setCustomColor() method (as alias of set_custom_color).
+	*	workbook: add alias method setCustomColor().
 	*	workbook: add send() method.
+	*	spreadsheet: add alias methods setMerge(), setColumn(), writeFormula(), writeNumber(), writeString(), writeUrl().
+-	Worksheet: add getDimensions() method.
+-	Worksheet: Fix some warnings. Fix bug (mistake porting from Perl) setting $grbit in _store_colinfo().
 
 0.3.0 (2005-11-01):
 - Fixed cell merging (fix contributed by Nicolas Kahn - thanks!)
