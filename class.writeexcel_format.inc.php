@@ -555,13 +555,23 @@ class writeexcel_format {
 							  E_USER_ERROR);
 			}
 
+			// Un-camelcase (for compatibility with PEAR Spreadsheet_Excel_Writer property names)
+			if ($key === 'FontFamily') {
+				$key = 'font';
+			}
+			else {
+				$key = strtolower(preg_replace('/([a-z])([A-Z])/', '${1}_${2}', $key));
+			}
+
 			/* Evaling all $values as a strings gets around the problem of
 			   some numerical format strings being evaluated as numbers, for
 			   example "00000" for a zip code. */
 			if (is_int($key)) {
-				eval("\$this->set_$value();");
+				$method = 'set_' . $value;
+				$this->$method();
 			} else {
-				eval("\$this->set_$key('$value');");
+				$method = 'set_' . $key;
+				$this->$method($value);
 			}
 
 		}
