@@ -28,6 +28,7 @@ require_once('class.writeexcel_biffwriter.inc.php');
 require_once('class.writeexcel_format.inc.php');
 require_once('class.writeexcel_formula.inc.php');
 require_once('class.writeexcel_olewriter.inc.php');
+require_once('class.writeexcel_worksheet.inc.php');
 
 class writeexcel_workbook extends writeexcel_biffwriter {
 
