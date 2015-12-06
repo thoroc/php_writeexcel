@@ -206,4 +206,3 @@ class writeexcel_biffwriter {
 
 }
 
-?>

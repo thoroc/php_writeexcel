@@ -1146,4 +1146,3 @@ function _store_codepage() {
 
 }
 
-?>

@@ -350,4 +350,3 @@ class writeexcel_olewriter {
 
 }
 
-?>

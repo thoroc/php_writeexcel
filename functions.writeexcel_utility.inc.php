@@ -268,4 +268,3 @@ function xl_date_1904($exceldate) {
     return $exceldate;
 }
 
-?>
