@@ -195,6 +195,30 @@ class writeexcel_worksheet extends writeexcel_biffwriter {
 		$this->_initialize();
 	}
 
+
+	/*
+	* Returns the (0-based) dimensions of the sheet in which there is data,
+	* both as an array and in the optionally given parameters by reference.
+	*
+	* @param int &$row_min
+	* @param int &$col_min
+	* @param int &$row_max
+	* @param int &$col_max
+	* @return array
+	*/
+	function getDimensions(&$row_min = null, &$col_min = null, &$row_max = null, &$col_max = null) {
+		$row_min	= $this->_dim_rowmin;	// First row
+		$col_min	= $this->_dim_colmin;	// First column
+		$row_max	= $this->_dim_rowmax;	// Last row plus 1
+		$col_max	= $this->_dim_colmax;	// Last column plus 1
+		return array(
+			'row_min'	=> $row_min,
+			'col_min'	=> $col_min,
+			'row_max'	=> $row_max,
+			'col_max'	=> $col_max,
+		);
+	}
+
 ###############################################################################
 #
 # _initialize()
@@ -436,8 +460,8 @@ function set_column() {
 		return;
 	}
 
-	$width  = $_[4] ? 0 : $_[2]; # Set width to zero if column is hidden
-	$format = $_[3];
+	$width  = @$_[4] ? 0 : $_[2]; # Set width to zero if column is hidden
+	$format = @$_[3];
 
 	list($firstcol, $lastcol) = $_;
 
@@ -1153,7 +1177,7 @@ function write_number() {
 	$col	= $_[1];						# Zero indexed column
 	$num	= $_[2];
 //!!!
-	$xf	= $this->_XF($row, $col, $_[3]); # The cell format
+	$xf	= $this->_XF($row, $col, @$_[3]); # The cell format
 
 	# Check that row and col are valid and store max and min values
 	if ($row >= $this->_xls_rowmax) { return -2; }
@@ -1210,7 +1234,7 @@ function write_string() {
 	$col	= $_[1];						# Zero indexed column
 	$strlen  = strlen($_[2]);
 	$str	= $_[2];
-	$xf	= $this->_XF($row, $col, $_[3]); # The cell format
+	$xf	= $this->_XF($row, $col, @$_[3]); # The cell format
 
 	$str_error = 0;
 
@@ -1335,7 +1359,7 @@ function write_formula() {
 	# we set $num to zero and set the option flags in $grbit to ensure
 	# automatic calculation of the formula when the file is opened.
 	#
-	$xf		= $this->_XF($row, $col, $_[3]); # The cell format
+	$xf		= $this->_XF($row, $col, @$_[3]); # The cell format
 	$num	= 0x00;						# Current value of formula
 	$grbit	= 0x03;						# Option flags
 	$chn	= 0x0000;						# Must be zero
@@ -1471,7 +1495,7 @@ function _write_url_web() {
 	if (isset($_[5])) {
 		$str		= $_[5];						# Alternative label
 	}
-	$xf		= $_[6] ? $_[6] : $this->_url_format;  # The cell format
+	$xf		= @$_[6] ? $_[6] : $this->_url_format;  # The cell format
 
 	# Write the visible label using the write_string() method.
 	if(!isset($str)) {
@@ -1540,7 +1564,7 @@ function _write_url_internal() {
 	if (isset($_[5])) {
 		$str		= $_[5];						# Alternative label
 	}
-	$xf		= $_[6] ? $_[6] : $this->_url_format;  # The cell format
+	$xf		= @$_[6] ? $_[6] : $this->_url_format;  # The cell format
 
 	# Strip URL type
 	$url = preg_replace('s[^internal:]', '', $url);
@@ -1968,17 +1992,17 @@ function _store_colinfo($_) {
 	$record	= 0x007D;		# Record identifier
 	$length	= 0x000B;		# Number of bytes to follow
 
-	$colFirst = $_[0] ? $_[0] : 0;	# First formatted column
-	$colLast  = $_[1] ? $_[1] : 0;	# Last formatted column
-	$coldx	= $_[2] ? $_[2] : 8.43;	# Col width, 8.43 is Excel default
+	$colFirst = @$_[0] ? $_[0] : 0;	# First formatted column
+	$colLast  = @$_[1] ? $_[1] : 0;	# Last formatted column
+	$coldx	= @$_[2] ? $_[2] : 8.43;	# Col width, 8.43 is Excel default
 
 	$coldx	+= 0.72;		# Fudge. Excel subtracts 0.72 !?
 	$coldx	*= 256;			# Convert to units of 1/256 of a char
 
 	//$ixfe;					# XF index
-	$grbit	= $_[4] || 0;	# Option flags
+	$grbit	= isset($_[4]) ? $_[4] : 0;	# Option flags
 	$reserved = 0x00;			# Reserved
-	$format	= $_[3];		# Format object
+	$format	= @$_[3];		# Format object
 
 	# Check for a format object
 	if (isset($_[3])) {
@@ -2012,8 +2036,8 @@ function _store_selection($_) {
 
 	$rwFirst  = $_[0];				# First row in reference
 	$colFirst = $_[1];				# First col in reference
-	$rwLast	= $_[2] ? $_[2] : $rwFirst;	# Last  row in reference
-	$colLast  = $_[3] ? $_[3] : $colFirst;	# Last  col in reference
+	$rwLast	= @$_[2] ? $_[2] : $rwFirst;	# Last  row in reference
+	$colLast  = @$_[3] ? $_[3] : $colFirst;	# Last  col in reference
 
 	# Swap last row/col for first row/col as necessary
 	if ($rwFirst > $rwLast) {
@@ -2965,6 +2989,27 @@ function insert_bitmap() {
 		$data	= pack('vv', $this->_zoom, 100);
 
 		$this->_append($header . $data);
+	}
+
+
+	#### PEAR Spreadsheet_Excel_Writer compatibility aliases #####
+	public function setMerge($first_row, $first_col, $last_row, $last_col) {
+		return $this->merge_cells($first_row, $first_col, $last_row, $last_col);
+	}
+	public function setColumn($firstcol, $lastcol, $width, $format = null, $hidden = null) {
+		return $this->set_column($firstcol, $lastcol, $width, $format, $hidden);
+	}
+	public function writeFormula($row, $col, $formula, $format) {
+		return $this->write_formula($row, $col, $formula, $format);
+	}
+	public function writeNumber($row, $col, $num, $format) {
+		return $this->write_number($row, $col, $num, $format);
+	}
+	public function writeString($row, $col, $string, $format) {
+		return $this->write_string($row, $col, $string, $format);
+	}
+	public function writeUrl($row, $col, $url, $string, $format) {
+		return $this->write_url($row, $col, $url, $string, $format);
 	}
 
 }
