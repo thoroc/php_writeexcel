@@ -1,10 +1,17 @@
-2015-12-06:
+2015-12-06 (Craig Manley)
 -	Forked by me (Craig Manley) from https://github.com/thoroc/php_writeexcel which is almost an exact copy of 0.3.0 with
 	a few warning suppressions, allowance of cell strings longer than 255 chars, and a composer.json file.
 -	Move examples into subdir.
-
-
-
+-	Replace space indentation with tabs.
+-	Add scopes to class properties.
+-	User code only needs to require the workbook class now. The worksheet is automatically included.
+-	Workbook constructor now uses an associative array of options, including now optional filename.
+-	Workbook: add getFileName() method to access the given or temporary filename.
+-	Workbook: add toString() method to return the workbook binary data as a string.
+-	Modified to act as a drop-in compatible replacement for PEAR's Spreadsheet_Excel_Writer, as far as I need:
+	*	format: make setting fonts with set_properties() compatible with PEAR's Spreadsheet_Excel_Writer.
+	*	workbook: add setCustomColor() method (as alias of set_custom_color).
+	*	workbook: add send() method.
 
 0.3.0 (2005-11-01):
 - Fixed cell merging (fix contributed by Nicolas Kahn - thanks!)
