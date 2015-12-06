@@ -1,28 +1,38 @@
 <?php
+/*
+* This is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or (at your option) any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this software; if not, write to the
+* Free Software Foundation, Inc., 59 Temple Place,
+* Suite 330, Boston, MA  02111-1307 USA
+*/
 
 /*
- * Copyleft 2002 Johann Hanne
- *
- * This is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place,
- * Suite 330, Boston, MA  02111-1307 USA
- */
+* This is the Spreadsheet::WriteExcel Perl package ported to PHP
+* Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
+*
+* Copyleft 2002 Johann Hanne
+*/
 
 /*
- * This is the Spreadsheet::WriteExcel Perl package ported to PHP
- * Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
- */
+* Modified for compatibility with PEAR's Spreadsheet_Excel_Writer, as far as I need.
+* Modified constructor to allow associative array of options, including optional filename.
+* Replace spaces with 4 space wide tabs.
+* Fix warnings.
+* Add property scopes.
+* Require worksheet class here so that caller doesn't have to do it.
+*
+* Copyright 2015 Craig Manley
+*/
 
 require_once('class.writeexcel_biffwriter.inc.php');
 require_once('class.writeexcel_format.inc.php');
@@ -31,6 +41,9 @@ require_once('class.writeexcel_olewriter.inc.php');
 require_once('class.writeexcel_worksheet.inc.php');
 
 class writeexcel_workbook extends writeexcel_biffwriter {
+
+	protected $_debug;
+	protected $_file_is_tmp;
 
 	protected $_filename;
 	protected $_tmpfilename;
@@ -52,47 +65,93 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	protected $_formats;
 	protected $_palette;
 
-	###############################################################################
-	#
-	# new()
-	#
-	# Constructor. Creates a new Workbook object from a BIFFwriter object.
-	#
-	function writeexcel_workbook($filename) {
 
+	/**
+	* Constructor.
+	* Creates a new Workbook object from a BIFFwriter object.
+	*
+	* Supported options:
+	* <pre>
+	*	debug (boolean)
+	*	filename (string)
+	*		If not given, then data is written to a temporary file which is automatically deleted on destruction.
+	*		If you want to print directly to the browser, then use the filename 'php://output', but send headers first.
+	*	temp_dir (string) Directory for temporary file, default is sys_get_temp_dir().
+	*	temp_prefix (string) Prefix to pass to tempnam(), default = 'xls_'.
+	* </pre>
+	*
+	* @param array $options	(for backwards compatibility, you may still pass a string filename here instead of an array)
+	*/
+	public function __construct($options = null) {
+		if (is_array($options)) {
+			// nop
+		}
+		elseif (is_null($options)) {
+			$options = array();
+		}
+		elseif (is_string($options)) { // convert old style filename argument into option
+			$options = array('filename' => $options);
+		}
+		else {
+			throw new \InvalidArgumentException('Argument must be null or an associative array of options');
+		}
+		foreach (array('filename', 'temp_dir', 'temp_prefix') as $key) {
+			if (array_key_exists($key, $options)) {
+				if (!(is_null($options[$key]) || (is_string($options[$key]) && strlen($options[$key])))) {
+					throw new \InvalidArgumentException("Option '$key' must be null or a non-empty string");
+				}
+			}
+		}
+		$this->_debug = @$options['debug'];
+		$this->_debug && error_log(__METHOD__ . ' options: ' . print_r($options,1));
+		$filename = @$options['filename'];
+		if (is_null($filename)) {
+			$temp_dir = isset($options['temp_dir']) && is_dir($options['temp_dir']) ? $options['temp_dir'] : sys_get_temp_dir();
+			$filename = tempnam($temp_dir, isset($options['temp_prefix']) ? $options['temp_prefix'] : 'xls_');
+			if (!$filename) {
+				throw new \Exception('Failed to create temporary file');
+			}
+			$this->_file_is_tmp = true;
+			/*
+			register_shutdown_function(function($filename, $debug) {
+				$debug && error_log(__FILE__ . ' register_shutdown_function');
+				if (file_exists($filename)) {
+					$debug && error_log(__FILE__ . " register_shutdown_function unlink('$filename')");
+					unlink($filename) || trigger_error("Failed to unlink('$filename') in register_shutdown_function", E_USER_WARNING);
+				}
+			}, $filename, $this->_debug);
+			*/
+		}
+		$this->_debug && error_log(__METHOD__ . sprintf(' filename: (%s) %s', gettype($filename), $filename));
+
+		// Original code starts here:
 		$this->writeexcel_biffwriter();
 
 		$tmp_format  = new writeexcel_format();
 		$byte_order  = $this->_byte_order;
-		$parser	  = new writeexcel_formula($byte_order);
+		$parser	= new writeexcel_formula($byte_order);
 
-		$this->_filename		  = $filename;
+		$this->_filename		= $filename;
 		$this->_parser			= $parser;
-	//?	$this->_tempdir		   = undef;
-		$this->_1904			  = 0;
-		$this->_activesheet	   = 0;
+	//?	$this->_tempdir			= undef;
+		$this->_1904			= 0;
+		$this->_activesheet		= 0;
 		$this->_firstsheet		= 0;
-		$this->_selected		  = 0;
-		$this->_xf_index		  = 16; # 15 style XF's and 1 cell XF.
+		$this->_selected		= 0;
+		$this->_xf_index		= 16; # 15 style XF's and 1 cell XF.
 		$this->_fileclosed		= 0;
-		$this->_biffsize		  = 0;
-		$this->_sheetname		 = "Sheet";
+		$this->_biffsize		= 0;
+		$this->_sheetname		= "Sheet";
 		$this->_tmp_format		= $tmp_format;
 		$this->_url_format		= false;
-		$this->_codepage		  = 0x04E4;
+		$this->_codepage		= 0x04E4;
 		$this->_worksheets		= array();
 		$this->_sheetnames		= array();
-		$this->_formats		   = array();
-		$this->_palette		   = array();
+		$this->_formats			= array();
+		$this->_palette			= array();
 
 		# Add the default format for hyperlinks
-		$this->_url_format =& $this->addformat(array('color' => 'blue', 'underline' => 1));
-
-		# Check for a filename
-		if ($this->_filename == '') {
-	//todo: print error
-			return;
-		}
+		$this->_url_format = $this->addformat(array('color' => 'blue', 'underline' => 1));
 
 		# Try to open the named file and see if it throws any errors.
 		# If the filename is a reference it is assumed that it is a valid
@@ -103,6 +162,70 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		# Set colour palette.
 		$this->set_palette_xl97();
 	}
+
+
+	/**
+	* Destructor. Deletes the temporary file if any.
+	*/
+	public function __destruct() {
+		$this->_debug && error_log(__METHOD__);
+		if ($this->_file_is_tmp) {
+			$filename = $this->getFileName();
+			if (file_exists($filename)) {
+				$this->_debug && error_log(__METHOD__ . " unlink('$filename')");
+				unlink($filename) || trigger_error("Failed to unlink('$filename') in " . __METHOD__, E_USER_WARNING);
+			}
+		}
+	}
+
+
+	/**
+	* Returns the name of the file.
+	*
+	* @return string
+	*/
+	public function getFileName() {
+		return $this->_filename;
+	}
+
+
+	/**
+	* Send download HTTP headers for the given virtual/download file name.
+	*
+	* @param string $filename optional
+	* @access public
+	*/
+	public function send($filename = null) {
+		header('Content-type: application/vnd.ms-excel');
+		if ($filename) {
+			header('Content-Disposition: attachment; filename="' . preg_replace('[\"\n]', '_', $filename) . '"');	// TODO: better escaping
+		}
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate, post-check=0,pre-check=0');
+		header('Pragma: public');
+	}
+
+
+	/**
+	* Closes the workbook and returns the contents as a string.
+	* This will fail if you're using a filename/resource that doesn't support seeking (e.g. php://output)
+	*
+	* @return string|false
+	*/
+	public function toString() {
+		$this->close();
+		//if (!$this->_fileclosed) {
+		//	throw new \Exception('Call close() before attempting to call toString()');
+		//}
+		$filename = $this->getFileName();
+		if (!is_string($filename)) {
+			throw new \Exception('Unable to determine file name');
+		}
+		return file_get_contents($this->getFileName());
+	}
+
+
+
 
 	###############################################################################
 	#
@@ -154,7 +277,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 			trigger_error("Sheetname $name must be <= 31 chars", E_USER_ERROR);
 		}
 
-		$index	 = sizeof($this->_worksheets);
+		$index	= sizeof($this->_worksheets);
 		$sheetname = $this->_sheetname;
 
 		if ($name == "") {
@@ -169,12 +292,12 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		}
 
 		$worksheet = new writeexcel_worksheet($name, $index, $this->_activesheet,
-											  $this->_firstsheet,
-											  $this->_url_format, $this->_parser,
-											  $this->_tempdir);
+											$this->_firstsheet,
+											$this->_url_format, $this->_parser,
+											$this->_tempdir);
 
 		$this->_worksheets[$index] = &$worksheet;	# Store ref for iterator
-		$this->_sheetnames[$index] = $name;		 # Store EXTERNSHEET names
+		$this->_sheetnames[$index] = $name;		# Store EXTERNSHEET names
 		$this->_parser->set_ext_sheet($name, $index); # Store names in Formula.pm
 		return $worksheet;
 	}
@@ -244,9 +367,9 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		}
 
 		# Check that the colour components are in the right range
-		if ( ($red   < 0 || $red   > 255) ||
-			 ($green < 0 || $green > 255) ||
-			 ($blue  < 0 || $blue  > 255) )
+		if ( ($red	< 0 || $red	> 255) ||
+			($green < 0 || $green > 255) ||
+			($blue  < 0 || $blue  > 255) )
 		{
 	//todo		carp "Color component outside range: 0 <= color <= 255";
 			return;
@@ -268,64 +391,63 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	#
 	function set_palette_xl97() {
 		$this->_palette = array(
-								array(0x00, 0x00, 0x00, 0x00),   # 8
-								array(0xff, 0xff, 0xff, 0x00),   # 9
-								array(0xff, 0x00, 0x00, 0x00),   # 10
-								array(0x00, 0xff, 0x00, 0x00),   # 11
-								array(0x00, 0x00, 0xff, 0x00),   # 12
-								array(0xff, 0xff, 0x00, 0x00),   # 13
-								array(0xff, 0x00, 0xff, 0x00),   # 14
-								array(0x00, 0xff, 0xff, 0x00),   # 15
-								array(0x80, 0x00, 0x00, 0x00),   # 16
-								array(0x00, 0x80, 0x00, 0x00),   # 17
-								array(0x00, 0x00, 0x80, 0x00),   # 18
-								array(0x80, 0x80, 0x00, 0x00),   # 19
-								array(0x80, 0x00, 0x80, 0x00),   # 20
-								array(0x00, 0x80, 0x80, 0x00),   # 21
-								array(0xc0, 0xc0, 0xc0, 0x00),   # 22
-								array(0x80, 0x80, 0x80, 0x00),   # 23
-								array(0x99, 0x99, 0xff, 0x00),   # 24
-								array(0x99, 0x33, 0x66, 0x00),   # 25
-								array(0xff, 0xff, 0xcc, 0x00),   # 26
-								array(0xcc, 0xff, 0xff, 0x00),   # 27
-								array(0x66, 0x00, 0x66, 0x00),   # 28
-								array(0xff, 0x80, 0x80, 0x00),   # 29
-								array(0x00, 0x66, 0xcc, 0x00),   # 30
-								array(0xcc, 0xcc, 0xff, 0x00),   # 31
-								array(0x00, 0x00, 0x80, 0x00),   # 32
-								array(0xff, 0x00, 0xff, 0x00),   # 33
-								array(0xff, 0xff, 0x00, 0x00),   # 34
-								array(0x00, 0xff, 0xff, 0x00),   # 35
-								array(0x80, 0x00, 0x80, 0x00),   # 36
-								array(0x80, 0x00, 0x00, 0x00),   # 37
-								array(0x00, 0x80, 0x80, 0x00),   # 38
-								array(0x00, 0x00, 0xff, 0x00),   # 39
-								array(0x00, 0xcc, 0xff, 0x00),   # 40
-								array(0xcc, 0xff, 0xff, 0x00),   # 41
-								array(0xcc, 0xff, 0xcc, 0x00),   # 42
-								array(0xff, 0xff, 0x99, 0x00),   # 43
-								array(0x99, 0xcc, 0xff, 0x00),   # 44
-								array(0xff, 0x99, 0xcc, 0x00),   # 45
-								array(0xcc, 0x99, 0xff, 0x00),   # 46
-								array(0xff, 0xcc, 0x99, 0x00),   # 47
-								array(0x33, 0x66, 0xff, 0x00),   # 48
-								array(0x33, 0xcc, 0xcc, 0x00),   # 49
-								array(0x99, 0xcc, 0x00, 0x00),   # 50
-								array(0xff, 0xcc, 0x00, 0x00),   # 51
-								array(0xff, 0x99, 0x00, 0x00),   # 52
-								array(0xff, 0x66, 0x00, 0x00),   # 53
-								array(0x66, 0x66, 0x99, 0x00),   # 54
-								array(0x96, 0x96, 0x96, 0x00),   # 55
-								array(0x00, 0x33, 0x66, 0x00),   # 56
-								array(0x33, 0x99, 0x66, 0x00),   # 57
-								array(0x00, 0x33, 0x00, 0x00),   # 58
-								array(0x33, 0x33, 0x00, 0x00),   # 59
-								array(0x99, 0x33, 0x00, 0x00),   # 60
-								array(0x99, 0x33, 0x66, 0x00),   # 61
-								array(0x33, 0x33, 0x99, 0x00),   # 62
-								array(0x33, 0x33, 0x33, 0x00),   # 63
-							);
-
+			array(0x00, 0x00, 0x00, 0x00),	# 8
+			array(0xff, 0xff, 0xff, 0x00),	# 9
+			array(0xff, 0x00, 0x00, 0x00),	# 10
+			array(0x00, 0xff, 0x00, 0x00),	# 11
+			array(0x00, 0x00, 0xff, 0x00),	# 12
+			array(0xff, 0xff, 0x00, 0x00),	# 13
+			array(0xff, 0x00, 0xff, 0x00),	# 14
+			array(0x00, 0xff, 0xff, 0x00),	# 15
+			array(0x80, 0x00, 0x00, 0x00),	# 16
+			array(0x00, 0x80, 0x00, 0x00),	# 17
+			array(0x00, 0x00, 0x80, 0x00),	# 18
+			array(0x80, 0x80, 0x00, 0x00),	# 19
+			array(0x80, 0x00, 0x80, 0x00),	# 20
+			array(0x00, 0x80, 0x80, 0x00),	# 21
+			array(0xc0, 0xc0, 0xc0, 0x00),	# 22
+			array(0x80, 0x80, 0x80, 0x00),	# 23
+			array(0x99, 0x99, 0xff, 0x00),	# 24
+			array(0x99, 0x33, 0x66, 0x00),	# 25
+			array(0xff, 0xff, 0xcc, 0x00),	# 26
+			array(0xcc, 0xff, 0xff, 0x00),	# 27
+			array(0x66, 0x00, 0x66, 0x00),	# 28
+			array(0xff, 0x80, 0x80, 0x00),	# 29
+			array(0x00, 0x66, 0xcc, 0x00),	# 30
+			array(0xcc, 0xcc, 0xff, 0x00),	# 31
+			array(0x00, 0x00, 0x80, 0x00),	# 32
+			array(0xff, 0x00, 0xff, 0x00),	# 33
+			array(0xff, 0xff, 0x00, 0x00),	# 34
+			array(0x00, 0xff, 0xff, 0x00),	# 35
+			array(0x80, 0x00, 0x80, 0x00),	# 36
+			array(0x80, 0x00, 0x00, 0x00),	# 37
+			array(0x00, 0x80, 0x80, 0x00),	# 38
+			array(0x00, 0x00, 0xff, 0x00),	# 39
+			array(0x00, 0xcc, 0xff, 0x00),	# 40
+			array(0xcc, 0xff, 0xff, 0x00),	# 41
+			array(0xcc, 0xff, 0xcc, 0x00),	# 42
+			array(0xff, 0xff, 0x99, 0x00),	# 43
+			array(0x99, 0xcc, 0xff, 0x00),	# 44
+			array(0xff, 0x99, 0xcc, 0x00),	# 45
+			array(0xcc, 0x99, 0xff, 0x00),	# 46
+			array(0xff, 0xcc, 0x99, 0x00),	# 47
+			array(0x33, 0x66, 0xff, 0x00),	# 48
+			array(0x33, 0xcc, 0xcc, 0x00),	# 49
+			array(0x99, 0xcc, 0x00, 0x00),	# 50
+			array(0xff, 0xcc, 0x00, 0x00),	# 51
+			array(0xff, 0x99, 0x00, 0x00),	# 52
+			array(0xff, 0x66, 0x00, 0x00),	# 53
+			array(0x66, 0x66, 0x99, 0x00),	# 54
+			array(0x96, 0x96, 0x96, 0x00),	# 55
+			array(0x00, 0x33, 0x66, 0x00),	# 56
+			array(0x33, 0x99, 0x66, 0x00),	# 57
+			array(0x00, 0x33, 0x00, 0x00),	# 58
+			array(0x33, 0x33, 0x00, 0x00),	# 59
+			array(0x99, 0x33, 0x00, 0x00),	# 60
+			array(0x99, 0x33, 0x66, 0x00),	# 61
+			array(0x33, 0x33, 0x99, 0x00),	# 62
+			array(0x33, 0x33, 0x33, 0x00),	# 63
+		);
 		return 0;
 	}
 
@@ -337,64 +459,63 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	#
 	function set_palette_xl5() {
 		$this->_palette = array(
-								array(0x00, 0x00, 0x00, 0x00),   # 8
-								array(0xff, 0xff, 0xff, 0x00),   # 9
-								array(0xff, 0x00, 0x00, 0x00),   # 10
-								array(0x00, 0xff, 0x00, 0x00),   # 11
-								array(0x00, 0x00, 0xff, 0x00),   # 12
-								array(0xff, 0xff, 0x00, 0x00),   # 13
-								array(0xff, 0x00, 0xff, 0x00),   # 14
-								array(0x00, 0xff, 0xff, 0x00),   # 15
-								array(0x80, 0x00, 0x00, 0x00),   # 16
-								array(0x00, 0x80, 0x00, 0x00),   # 17
-								array(0x00, 0x00, 0x80, 0x00),   # 18
-								array(0x80, 0x80, 0x00, 0x00),   # 19
-								array(0x80, 0x00, 0x80, 0x00),   # 20
-								array(0x00, 0x80, 0x80, 0x00),   # 21
-								array(0xc0, 0xc0, 0xc0, 0x00),   # 22
-								array(0x80, 0x80, 0x80, 0x00),   # 23
-								array(0x80, 0x80, 0xff, 0x00),   # 24
-								array(0x80, 0x20, 0x60, 0x00),   # 25
-								array(0xff, 0xff, 0xc0, 0x00),   # 26
-								array(0xa0, 0xe0, 0xe0, 0x00),   # 27
-								array(0x60, 0x00, 0x80, 0x00),   # 28
-								array(0xff, 0x80, 0x80, 0x00),   # 29
-								array(0x00, 0x80, 0xc0, 0x00),   # 30
-								array(0xc0, 0xc0, 0xff, 0x00),   # 31
-								array(0x00, 0x00, 0x80, 0x00),   # 32
-								array(0xff, 0x00, 0xff, 0x00),   # 33
-								array(0xff, 0xff, 0x00, 0x00),   # 34
-								array(0x00, 0xff, 0xff, 0x00),   # 35
-								array(0x80, 0x00, 0x80, 0x00),   # 36
-								array(0x80, 0x00, 0x00, 0x00),   # 37
-								array(0x00, 0x80, 0x80, 0x00),   # 38
-								array(0x00, 0x00, 0xff, 0x00),   # 39
-								array(0x00, 0xcf, 0xff, 0x00),   # 40
-								array(0x69, 0xff, 0xff, 0x00),   # 41
-								array(0xe0, 0xff, 0xe0, 0x00),   # 42
-								array(0xff, 0xff, 0x80, 0x00),   # 43
-								array(0xa6, 0xca, 0xf0, 0x00),   # 44
-								array(0xdd, 0x9c, 0xb3, 0x00),   # 45
-								array(0xb3, 0x8f, 0xee, 0x00),   # 46
-								array(0xe3, 0xe3, 0xe3, 0x00),   # 47
-								array(0x2a, 0x6f, 0xf9, 0x00),   # 48
-								array(0x3f, 0xb8, 0xcd, 0x00),   # 49
-								array(0x48, 0x84, 0x36, 0x00),   # 50
-								array(0x95, 0x8c, 0x41, 0x00),   # 51
-								array(0x8e, 0x5e, 0x42, 0x00),   # 52
-								array(0xa0, 0x62, 0x7a, 0x00),   # 53
-								array(0x62, 0x4f, 0xac, 0x00),   # 54
-								array(0x96, 0x96, 0x96, 0x00),   # 55
-								array(0x1d, 0x2f, 0xbe, 0x00),   # 56
-								array(0x28, 0x66, 0x76, 0x00),   # 57
-								array(0x00, 0x45, 0x00, 0x00),   # 58
-								array(0x45, 0x3e, 0x01, 0x00),   # 59
-								array(0x6a, 0x28, 0x13, 0x00),   # 60
-								array(0x85, 0x39, 0x6a, 0x00),   # 61
-								array(0x4a, 0x32, 0x85, 0x00),   # 62
-								array(0x42, 0x42, 0x42, 0x00),   # 63
-							);
-
+			array(0x00, 0x00, 0x00, 0x00),	# 8
+			array(0xff, 0xff, 0xff, 0x00),	# 9
+			array(0xff, 0x00, 0x00, 0x00),	# 10
+			array(0x00, 0xff, 0x00, 0x00),	# 11
+			array(0x00, 0x00, 0xff, 0x00),	# 12
+			array(0xff, 0xff, 0x00, 0x00),	# 13
+			array(0xff, 0x00, 0xff, 0x00),	# 14
+			array(0x00, 0xff, 0xff, 0x00),	# 15
+			array(0x80, 0x00, 0x00, 0x00),	# 16
+			array(0x00, 0x80, 0x00, 0x00),	# 17
+			array(0x00, 0x00, 0x80, 0x00),	# 18
+			array(0x80, 0x80, 0x00, 0x00),	# 19
+			array(0x80, 0x00, 0x80, 0x00),	# 20
+			array(0x00, 0x80, 0x80, 0x00),	# 21
+			array(0xc0, 0xc0, 0xc0, 0x00),	# 22
+			array(0x80, 0x80, 0x80, 0x00),	# 23
+			array(0x80, 0x80, 0xff, 0x00),	# 24
+			array(0x80, 0x20, 0x60, 0x00),	# 25
+			array(0xff, 0xff, 0xc0, 0x00),	# 26
+			array(0xa0, 0xe0, 0xe0, 0x00),	# 27
+			array(0x60, 0x00, 0x80, 0x00),	# 28
+			array(0xff, 0x80, 0x80, 0x00),	# 29
+			array(0x00, 0x80, 0xc0, 0x00),	# 30
+			array(0xc0, 0xc0, 0xff, 0x00),	# 31
+			array(0x00, 0x00, 0x80, 0x00),	# 32
+			array(0xff, 0x00, 0xff, 0x00),	# 33
+			array(0xff, 0xff, 0x00, 0x00),	# 34
+			array(0x00, 0xff, 0xff, 0x00),	# 35
+			array(0x80, 0x00, 0x80, 0x00),	# 36
+			array(0x80, 0x00, 0x00, 0x00),	# 37
+			array(0x00, 0x80, 0x80, 0x00),	# 38
+			array(0x00, 0x00, 0xff, 0x00),	# 39
+			array(0x00, 0xcf, 0xff, 0x00),	# 40
+			array(0x69, 0xff, 0xff, 0x00),	# 41
+			array(0xe0, 0xff, 0xe0, 0x00),	# 42
+			array(0xff, 0xff, 0x80, 0x00),	# 43
+			array(0xa6, 0xca, 0xf0, 0x00),	# 44
+			array(0xdd, 0x9c, 0xb3, 0x00),	# 45
+			array(0xb3, 0x8f, 0xee, 0x00),	# 46
+			array(0xe3, 0xe3, 0xe3, 0x00),	# 47
+			array(0x2a, 0x6f, 0xf9, 0x00),	# 48
+			array(0x3f, 0xb8, 0xcd, 0x00),	# 49
+			array(0x48, 0x84, 0x36, 0x00),	# 50
+			array(0x95, 0x8c, 0x41, 0x00),	# 51
+			array(0x8e, 0x5e, 0x42, 0x00),	# 52
+			array(0xa0, 0x62, 0x7a, 0x00),	# 53
+			array(0x62, 0x4f, 0xac, 0x00),	# 54
+			array(0x96, 0x96, 0x96, 0x00),	# 55
+			array(0x1d, 0x2f, 0xbe, 0x00),	# 56
+			array(0x28, 0x66, 0x76, 0x00),	# 57
+			array(0x00, 0x45, 0x00, 0x00),	# 58
+			array(0x45, 0x3e, 0x01, 0x00),	# 59
+			array(0x6a, 0x28, 0x13, 0x00),	# 60
+			array(0x85, 0x39, 0x6a, 0x00),	# 61
+			array(0x4a, 0x32, 0x85, 0x00),	# 62
+			array(0x42, 0x42, 0x42, 0x00),	# 63
+		);
 		return 0;
 	}
 
@@ -407,7 +528,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	function set_tempdir($tempdir) {
 	//todo
 	/*
-		croak "$_[0] is not a valid directory"				 unless -d $_[0];
+		croak "$_[0] is not a valid directory"				unless -d $_[0];
 		croak "set_tempdir must be called before addworksheet" if $self->sheets();
 	*/
 
@@ -424,11 +545,11 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	function set_codepage($cp) {
 
 		if($cp==1)
-		  $codepage   = 0x04E4;
+		$codepage	= 0x04E4;
 		else if($cp==2)
-		  $codepage   = 0x8000;
+		$codepage	= 0x8000;
 		if($codepage)
-		  $this->_codepage = $codepage;
+		$this->_codepage = $codepage;
 	}
 
 
@@ -461,7 +582,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 
 		$this->_store_externs();	# For print area and repeat rows
 
-		$this->_store_names();	  # For print area and repeat rows
+		$this->_store_names();	# For print area and repeat rows
 
 		$this->_store_codepage();
 
@@ -483,7 +604,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 
 		# Add BOUNDSHEET records
 		for ($c=0;$c<sizeof($this->_worksheets);$c++) {
-		   $sheet=&$this->_worksheets[$c];
+		$sheet=&$this->_worksheets[$c];
 			$this->_store_boundsheet($sheet->_name, $sheet->_offset);
 		}
 
@@ -537,8 +658,8 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	#
 	function _calc_sheet_offsets() {
 
-		$BOF	 = 11;
-		$EOF	 = 4;
+		$BOF	= 11;
+		$EOF	= 4;
 		$offset  = $this->_datasize;
 
 		foreach ($this->_worksheets as $sheet) {
@@ -565,7 +686,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	function _store_all_fonts() {
 		# _tmp_format is added by new(). We use this to write the default XF's
 		$format = $this->_tmp_format;
-		$font   = $format->get_font();
+		$font	= $format->get_font();
 
 		# Note: Fonts are 0-indexed. According to the SDK there is no index 4,
 		# so the following fonts are 0, 1, 2, 3, 5
@@ -577,10 +698,10 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		# Iterate through the XF objects and write a FONT record if it isn't the
 		# same as the default FONT and if it hasn't already been used.
 		#
-		$index = 6;				  # The first user defined FONT
+		$index = 6;				# The first user defined FONT
 
 		$key = $format->get_font_key(); # The default font from _tmp_format
-		$fonts[$key] = 0;			   # Index of the default font
+		$fonts[$key] = 0;			# Index of the default font
 
 		for ($c=0;$c<sizeof($this->_formats);$c++) {
 			$format=&$this->_formats[$c];
@@ -592,7 +713,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 				$format->_font_index = $fonts[$key];
 			} else {
 				# Add a new FONT record
-				$fonts[$key]		   = $index;
+				$fonts[$key]		= $index;
 				$format->_font_index = $index;
 				$index++;
 				$font = $format->get_font();
@@ -671,7 +792,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 			$this->_append($xf);
 		}
 
-		$xf = $format->get_xf('cell');	  # Cell XF
+		$xf = $format->get_xf('cell');	# Cell XF
 		$this->_append($xf);
 
 		# User defined XFs
@@ -753,7 +874,7 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 					$rowmax,
 					$colmin,
 					$colmax
-			   );
+			);
 			} elseif ($rowmin!==false) {
 				# Row title has been defined.
 				$this->_store_name_short(
@@ -794,26 +915,26 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	#
 	function _store_window1() {
 
-		$record	= 0x003D;				 # Record identifier
-		$length	= 0x0012;				 # Number of bytes to follow
+		$record	= 0x003D;				# Record identifier
+		$length	= 0x0012;				# Number of bytes to follow
 
-		$xWn	   = 0x0000;				 # Horizontal position of window
-		$yWn	   = 0x0000;				 # Vertical position of window
-		$dxWn	  = 0x25BC;				 # Width of window
-		$dyWn	  = 0x1572;				 # Height of window
+		$xWn	= 0x0000;				# Horizontal position of window
+		$yWn	= 0x0000;				# Vertical position of window
+		$dxWn	= 0x25BC;				# Width of window
+		$dyWn	= 0x1572;				# Height of window
 
-		$grbit	 = 0x0038;				 # Option flags
-		$ctabsel   = $this->_selected;	 # Number of workbook tabs selected
-		$wTabRatio = 0x0258;				 # Tab to scrollbar ratio
+		$grbit	= 0x0038;				# Option flags
+		$ctabsel	= $this->_selected;	# Number of workbook tabs selected
+		$wTabRatio = 0x0258;				# Tab to scrollbar ratio
 
-		$itabFirst = $this->_firstsheet;   # 1st displayed worksheet
-		$itabCur   = $this->_activesheet;  # Active worksheet
+		$itabFirst = $this->_firstsheet;	# 1st displayed worksheet
+		$itabCur	= $this->_activesheet;  # Active worksheet
 
 		$header	= pack("vv",		$record, $length);
-		$data	  = pack("vvvvvvvvv", $xWn, $yWn, $dxWn, $dyWn,
-									   $grbit,
-									   $itabCur, $itabFirst,
-									   $ctabsel, $wTabRatio);
+		$data	= pack("vvvvvvvvv", $xWn, $yWn, $dxWn, $dyWn,
+									$grbit,
+									$itabCur, $itabFirst,
+									$ctabsel, $wTabRatio);
 
 		$this->_append($header . $data);
 	}
@@ -825,16 +946,16 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	# Writes Excel BIFF BOUNDSHEET record.
 	#
 	function _store_boundsheet($sheetname, $offset) {
-		$record	= 0x0085;			   # Record identifier
+		$record	= 0x0085;			# Record identifier
 		$length	= 0x07 + strlen($sheetname); # Number of bytes to follow
 
 		//$sheetname = $_[0];				# Worksheet name
 		//$offset	= $_[1];				# Location of worksheet BOF
-		$grbit	 = 0x0000;			   # Sheet identifier
-		$cch	   = strlen($sheetname);   # Length of sheet name
+		$grbit	= 0x0000;			# Sheet identifier
+		$cch	= strlen($sheetname);	# Length of sheet name
 
 		$header	= pack("vv",  $record, $length);
-		$data	  = pack("VvC", $offset, $grbit, $cch);
+		$data	= pack("VvC", $offset, $grbit, $cch);
 
 		$this->_append($header . $data . $sheetname);
 	}
@@ -849,12 +970,12 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 		$record	= 0x0293; # Record identifier
 		$length	= 0x0004; # Bytes to follow
 
-		$ixfe	  = 0x8000; # Index to style XF
-		$BuiltIn   = 0x00;   # Built-in style
-		$iLevel	= 0xff;   # Outline style level
+		$ixfe	= 0x8000; # Index to style XF
+		$BuiltIn	= 0x00;	# Built-in style
+		$iLevel	= 0xff;	# Outline style level
 
 		$header	= pack("vv",  $record, $length);
-		$data	  = pack("vCC", $ixfe, $BuiltIn, $iLevel);
+		$data	= pack("vCC", $ixfe, $BuiltIn, $iLevel);
 
 		$this->_append($header . $data);
 	}
@@ -866,15 +987,15 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	# Writes Excel FORMAT record for non "built-in" numerical formats.
 	#
 	function _store_num_format($num_format, $index) {
-		$record	= 0x041E;				 # Record identifier
-		$length	= 0x03 + strlen($num_format);   # Number of bytes to follow
+		$record	= 0x041E;				# Record identifier
+		$length	= 0x03 + strlen($num_format);	# Number of bytes to follow
 
-		$format	= $num_format;				  # Custom format string
-		$ifmt	  = $index;				  # Format index code
-		$cch	   = strlen($format);		# Length of format string
+		$format	= $num_format;				# Custom format string
+		$ifmt	= $index;				# Format index code
+		$cch	= strlen($format);		# Length of format string
 
 		$header	= pack("vv", $record, $length);
-		$data	  = pack("vC", $ifmt, $cch);
+		$data	= pack("vC", $ifmt, $cch);
 
 		$this->_append($header . $data . $format);
 	}
@@ -886,13 +1007,13 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	# Write Excel 1904 record to indicate the date system in use.
 	#
 	function _store_1904() {
-		$record	= 0x0022;		 # Record identifier
-		$length	= 0x0002;		 # Bytes to follow
+		$record	= 0x0022;		# Record identifier
+		$length	= 0x0002;		# Bytes to follow
 
-		$f1904	 = $this->_1904; # Flag for 1904 date system
+		$f1904	= $this->_1904; # Flag for 1904 date system
 
 		$header	= pack("vv",  $record, $length);
-		$data	  = pack("v", $f1904);
+		$data	= pack("v", $f1904);
 
 		$this->_append($header . $data);
 	}
@@ -911,13 +1032,13 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	# A similar method is used in Worksheet.pm for a slightly different purpose.
 	#
 	function _store_externcount($par0) {
-		$record   = 0x0016;		  # Record identifier
-		$length   = 0x0002;		  # Number of bytes to follow
+		$record	= 0x0016;		# Record identifier
+		$length	= 0x0002;		# Number of bytes to follow
 
-		$cxals	= $par0;		   # Number of external references
+		$cxals	= $par0;		# Number of external references
 
-		$header   = pack("vv", $record, $length);
-		$data	 = pack("v",  $cxals);
+		$header	= pack("vv", $record, $length);
+		$data	= pack("v",  $cxals);
 
 		$this->_append($header . $data);
 	}
@@ -934,15 +1055,15 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	# A similar method is used in Worksheet.pm for a slightly different purpose.
 	#
 	function _store_externsheet($par0) {
-		$record	  = 0x0017;			   # Record identifier
-		$length	  = 0x02 + strlen($par0); # Number of bytes to follow
+		$record	= 0x0017;			# Record identifier
+		$length	= 0x02 + strlen($par0); # Number of bytes to follow
 
-		$sheetname   = $par0;				# Worksheet name
-		$cch		 = strlen($sheetname);   # Length of sheet name
-		$rgch		= 0x03;				 # Filename encoding
+		$sheetname	= $par0;				# Worksheet name
+		$cch		= strlen($sheetname);	# Length of sheet name
+		$rgch		= 0x03;				# Filename encoding
 
-		$header	  = pack("vv",  $record, $length);
-		$data		= pack("CC", $cch, $rgch);
+		$header	= pack("vv",  $record, $length);
+		$data	= pack("CC", $cch, $rgch);
 
 		$this->_append($header . $data . $sheetname);
 	}
@@ -956,60 +1077,60 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	# area, repeat rows only and repeat columns only.
 	#
 	function _store_name_short($par0, $par1, $par2, $par3, $par4, $par5) {
-		$record		  = 0x0018;	   # Record identifier
-		$length		  = 0x0024;	   # Number of bytes to follow
+		$record		= 0x0018;	# Record identifier
+		$length		= 0x0024;	# Number of bytes to follow
 
-		$index		   = $par0;		# Sheet index
-		$type			= $par1;
+		$index		= $par0;		# Sheet index
+		$type		= $par1;
 
-		$grbit		   = 0x0020;	   # Option flags
-		$chKey		   = 0x00;		 # Keyboard shortcut
-		$cch			 = 0x01;		 # Length of text name
-		$cce			 = 0x0015;	   # Length of text definition
-		$ixals		   = $index +1;	# Sheet index
-		$itab			= $ixals;	   # Equal to ixals
-		$cchCustMenu	 = 0x00;		 # Length of cust menu text
-		$cchDescription  = 0x00;		 # Length of description text
-		$cchHelptopic	= 0x00;		 # Length of help topic text
-		$cchStatustext   = 0x00;		 # Length of status bar text
+		$grbit		= 0x0020;	# Option flags
+		$chKey		= 0x00;		# Keyboard shortcut
+		$cch		= 0x01;		# Length of text name
+		$cce		= 0x0015;	# Length of text definition
+		$ixals		= $index +1;	# Sheet index
+		$itab			= $ixals;	# Equal to ixals
+		$cchCustMenu	= 0x00;		# Length of cust menu text
+		$cchDescription	= 0x00;		# Length of description text
+		$cchHelptopic	= 0x00;		# Length of help topic text
+		$cchStatustext	= 0x00;		# Length of status bar text
 		$rgch			= $type;		# Built-in name type
 
-		$unknown03	   = 0x3b;
-		$unknown04	   = 0xffff-$index;
-		$unknown05	   = 0x0000;
-		$unknown06	   = 0x0000;
-		$unknown07	   = 0x1087;
-		$unknown08	   = 0x8005;
+		$unknown03	= 0x3b;
+		$unknown04	= 0xffff-$index;
+		$unknown05	= 0x0000;
+		$unknown06	= 0x0000;
+		$unknown07	= 0x1087;
+		$unknown08	= 0x8005;
 
-		$rowmin		  = $par2;		# Start row
-		$rowmax		  = $par3;		# End row
-		$colmin		  = $par4;		# Start column
-		$colmax		  = $par5;		# end column
+		$rowmin		= $par2;		# Start row
+		$rowmax		= $par3;		# End row
+		$colmin		= $par4;		# Start column
+		$colmax		= $par5;		# end column
 
-		$header		  = pack("vv",  $record, $length);
-		$data			= pack("v", $grbit);
-		$data			  .= pack("C", $chKey);
-		$data			  .= pack("C", $cch);
-		$data			  .= pack("v", $cce);
-		$data			  .= pack("v", $ixals);
-		$data			  .= pack("v", $itab);
-		$data			  .= pack("C", $cchCustMenu);
-		$data			  .= pack("C", $cchDescription);
-		$data			  .= pack("C", $cchHelptopic);
-		$data			  .= pack("C", $cchStatustext);
-		$data			  .= pack("C", $rgch);
-		$data			  .= pack("C", $unknown03);
-		$data			  .= pack("v", $unknown04);
-		$data			  .= pack("v", $unknown05);
-		$data			  .= pack("v", $unknown06);
-		$data			  .= pack("v", $unknown07);
-		$data			  .= pack("v", $unknown08);
-		$data			  .= pack("v", $index);
-		$data			  .= pack("v", $index);
-		$data			  .= pack("v", $rowmin);
-		$data			  .= pack("v", $rowmax);
-		$data			  .= pack("C", $colmin);
-		$data			  .= pack("C", $colmax);
+		$header	= pack("vv",  $record, $length);
+		$data	= pack("v", $grbit);
+		$data	.= pack("C", $chKey);
+		$data	.= pack("C", $cch);
+		$data	.= pack("v", $cce);
+		$data	.= pack("v", $ixals);
+		$data	.= pack("v", $itab);
+		$data	.= pack("C", $cchCustMenu);
+		$data	.= pack("C", $cchDescription);
+		$data	.= pack("C", $cchHelptopic);
+		$data	.= pack("C", $cchStatustext);
+		$data	.= pack("C", $rgch);
+		$data	.= pack("C", $unknown03);
+		$data	.= pack("v", $unknown04);
+		$data	.= pack("v", $unknown05);
+		$data	.= pack("v", $unknown06);
+		$data	.= pack("v", $unknown07);
+		$data	.= pack("v", $unknown08);
+		$data	.= pack("v", $index);
+		$data	.= pack("v", $index);
+		$data	.= pack("v", $rowmin);
+		$data	.= pack("v", $rowmax);
+		$data	.= pack("C", $colmin);
+		$data	.= pack("C", $colmax);
 
 		$this->_append($header . $data);
 	}
@@ -1025,80 +1146,80 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	# Code abstraction for reuse can be carried too far, and I should know. ;-)
 	#
 	function _store_name_long($par0, $par1, $par2, $par3, $par4, $par5) {
-		$record		  = 0x0018;	   # Record identifier
-		$length		  = 0x003d;	   # Number of bytes to follow
+		$record		= 0x0018;	# Record identifier
+		$length		= 0x003d;	# Number of bytes to follow
 
-		$index		   = $par0;		# Sheet index
-		$type			= $par1;
+		$index		= $par0;		# Sheet index
+		$type		= $par1;
 
-		$grbit		   = 0x0020;	   # Option flags
-		$chKey		   = 0x00;		 # Keyboard shortcut
-		$cch			 = 0x01;		 # Length of text name
-		$cce			 = 0x002e;	   # Length of text definition
-		$ixals		   = $index +1;	# Sheet index
-		$itab			= $ixals;	   # Equal to ixals
-		$cchCustMenu	 = 0x00;		 # Length of cust menu text
-		$cchDescription  = 0x00;		 # Length of description text
-		$cchHelptopic	= 0x00;		 # Length of help topic text
-		$cchStatustext   = 0x00;		 # Length of status bar text
-		$rgch			= $type;		# Built-in name type
+		$grbit		= 0x0020;	# Option flags
+		$chKey		= 0x00;		# Keyboard shortcut
+		$cch			= 0x01;		# Length of text name
+		$cce			= 0x002e;	# Length of text definition
+		$ixals			= $index +1;	# Sheet index
+		$itab			= $ixals;	# Equal to ixals
+		$cchCustMenu	= 0x00;		# Length of cust menu text
+		$cchDescription	= 0x00;		# Length of description text
+		$cchHelptopic	= 0x00;		# Length of help topic text
+		$cchStatustext	= 0x00;		# Length of status bar text
+		$rgch			= $type;	# Built-in name type
 
-		$unknown01	   = 0x29;
-		$unknown02	   = 0x002b;
-		$unknown03	   = 0x3b;
-		$unknown04	   = 0xffff-$index;
-		$unknown05	   = 0x0000;
-		$unknown06	   = 0x0000;
-		$unknown07	   = 0x1087;
-		$unknown08	   = 0x8008;
+		$unknown01	= 0x29;
+		$unknown02	= 0x002b;
+		$unknown03	= 0x3b;
+		$unknown04	= 0xffff-$index;
+		$unknown05	= 0x0000;
+		$unknown06	= 0x0000;
+		$unknown07	= 0x1087;
+		$unknown08	= 0x8008;
 
-		$rowmin		  = $par2;		# Start row
-		$rowmax		  = $par3;		# End row
-		$colmin		  = $par4;		# Start column
-		$colmax		  = $par5;		# end column
+		$rowmin		= $par2;		# Start row
+		$rowmax		= $par3;		# End row
+		$colmin		= $par4;		# Start column
+		$colmax		= $par5;		# end column
 
-		$header		  = pack("vv",  $record, $length);
+		$header		= pack("vv",  $record, $length);
 		$data			= pack("v", $grbit);
-		$data			  .= pack("C", $chKey);
-		$data			  .= pack("C", $cch);
-		$data			  .= pack("v", $cce);
-		$data			  .= pack("v", $ixals);
-		$data			  .= pack("v", $itab);
-		$data			  .= pack("C", $cchCustMenu);
-		$data			  .= pack("C", $cchDescription);
-		$data			  .= pack("C", $cchHelptopic);
-		$data			  .= pack("C", $cchStatustext);
-		$data			  .= pack("C", $rgch);
-		$data			  .= pack("C", $unknown01);
-		$data			  .= pack("v", $unknown02);
+		$data			.= pack("C", $chKey);
+		$data			.= pack("C", $cch);
+		$data			.= pack("v", $cce);
+		$data			.= pack("v", $ixals);
+		$data			.= pack("v", $itab);
+		$data			.= pack("C", $cchCustMenu);
+		$data			.= pack("C", $cchDescription);
+		$data			.= pack("C", $cchHelptopic);
+		$data			.= pack("C", $cchStatustext);
+		$data			.= pack("C", $rgch);
+		$data			.= pack("C", $unknown01);
+		$data			.= pack("v", $unknown02);
 		# Column definition
-		$data			  .= pack("C", $unknown03);
-		$data			  .= pack("v", $unknown04);
-		$data			  .= pack("v", $unknown05);
-		$data			  .= pack("v", $unknown06);
-		$data			  .= pack("v", $unknown07);
-		$data			  .= pack("v", $unknown08);
-		$data			  .= pack("v", $index);
-		$data			  .= pack("v", $index);
-		$data			  .= pack("v", 0x0000);
-		$data			  .= pack("v", 0x3fff);
-		$data			  .= pack("C", $colmin);
-		$data			  .= pack("C", $colmax);
+		$data			.= pack("C", $unknown03);
+		$data			.= pack("v", $unknown04);
+		$data			.= pack("v", $unknown05);
+		$data			.= pack("v", $unknown06);
+		$data			.= pack("v", $unknown07);
+		$data			.= pack("v", $unknown08);
+		$data			.= pack("v", $index);
+		$data			.= pack("v", $index);
+		$data			.= pack("v", 0x0000);
+		$data			.= pack("v", 0x3fff);
+		$data			.= pack("C", $colmin);
+		$data			.= pack("C", $colmax);
 		# Row definition
-		$data			  .= pack("C", $unknown03);
-		$data			  .= pack("v", $unknown04);
-		$data			  .= pack("v", $unknown05);
-		$data			  .= pack("v", $unknown06);
-		$data			  .= pack("v", $unknown07);
-		$data			  .= pack("v", $unknown08);
-		$data			  .= pack("v", $index);
-		$data			  .= pack("v", $index);
-		$data			  .= pack("v", $rowmin);
-		$data			  .= pack("v", $rowmax);
-		$data			  .= pack("C", 0x00);
-		$data			  .= pack("C", 0xff);
+		$data			.= pack("C", $unknown03);
+		$data			.= pack("v", $unknown04);
+		$data			.= pack("v", $unknown05);
+		$data			.= pack("v", $unknown06);
+		$data			.= pack("v", $unknown07);
+		$data			.= pack("v", $unknown08);
+		$data			.= pack("v", $index);
+		$data			.= pack("v", $index);
+		$data			.= pack("v", $rowmin);
+		$data			.= pack("v", $rowmax);
+		$data			.= pack("C", 0x00);
+		$data			.= pack("C", 0xff);
 		# End of data
-		$data			  .= pack("C", 0x10);
+		$data			.= pack("C", 0x10);
 
 		$this->_append($header . $data);
 	}
@@ -1112,14 +1233,15 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	function _store_palette() {
 		$aref			= &$this->_palette;
 
-		$record		  = 0x0092;				  # Record identifier
-		$length		  = 2 + 4 * sizeof($aref);   # Number of bytes to follow
-		$ccv			 =		 sizeof($aref);   # Number of RGB values to follow
-		//$data;									  # The RGB data
+		$record		= 0x0092;					# Record identifier
+		$length		= 2 + 4 * sizeof($aref);	# Number of bytes to follow
+		$ccv		= sizeof($aref);			# Number of RGB values to follow
+		//$data;								# The RGB data
 
 		# Pack the RGB data
+		$data = '';
 		foreach($aref as $dat) {
-			$data .= call_user_func_array('pack', array_merge(array("CCCC"), $dat));
+			$data .= call_user_func_array('pack', array_merge(array('CCCC'), $dat));
 		}
 
 		$header = pack("vvv",  $record, $length, $ccv);
@@ -1135,14 +1257,21 @@ class writeexcel_workbook extends writeexcel_biffwriter {
 	#
 	function _store_codepage() {
 
-		$record		  = 0x0042;			   # Record identifier
-		$length		  = 0x0002;			   # Number of bytes to follow
-		$cv			  = $this->_codepage;	 # The code page
+		$record		= 0x0042;			# Record identifier
+		$length		= 0x0002;			# Number of bytes to follow
+		$cv			= $this->_codepage;	# The code page
 
-		$header		  = pack("vv", $record, $length);
-		$data			= pack("v",  $cv);
+		$header		= pack("vv", $record, $length);
+		$data		= pack("v",  $cv);
 
 		$this->_append($header.$data);
+	}
+
+
+
+	#### PEAR Spreadsheet_Excel_Writer compatibility aliases/methods #####
+	public function setCustomColor($index, $red, $green, $blue) {
+		return $this->set_custom_color($index, $red, $green, $blue);
 	}
 
 }
