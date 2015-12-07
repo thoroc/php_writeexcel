@@ -1,35 +1,34 @@
 <?php
+/*
+* Copyleft 2002 Johann Hanne
+*
+* This is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or (at your option) any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this software; if not, write to the
+* Free Software Foundation, Inc., 59 Temple Place,
+* Suite 330, Boston, MA  02111-1307 USA
+*/
 
 /*
- * Copyleft 2002 Johann Hanne
- *
- * This is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place,
- * Suite 330, Boston, MA  02111-1307 USA
- */
+* This is the Spreadsheet::WriteExcel Perl package ported to PHP
+* Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
+*/
 
 /*
- * This is the Spreadsheet::WriteExcel Perl package ported to PHP
- * Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
- */
-
-/*
- * Converts numeric $row/$col notation to an Excel cell reference string in
- * A1 notation.
- */
-function xl_rowcol_to_cell($row, $col, $row_abs=false, $col_abs=false) {
-
+* Converts numeric $row/$col notation to an Excel cell reference string in
+* A1 notation.
+*/
+function xl_rowcol_to_cell($row, $col, $row_abs=false, $col_abs=false)
+{
     $row_abs = $row_abs ? '$' : '';
     $col_abs = $col_abs ? '$' : '';
 
@@ -59,8 +58,8 @@ function xl_rowcol_to_cell($row, $col, $row_abs=false, $col_abs=false) {
  * The $row_absolute and $col_absolute parameters aren't documented because
  * they are mainly used internally and aren't very useful to the user.
  */
-function xl_cell_to_rowcol($cell) {
-
+function xl_cell_to_rowcol($cell)
+{
     preg_match('/(\$?)([A-I]?[A-Z])(\$?)(\d+)/', $cell, $reg);
 
     $col_abs = ($reg[1] == "") ? 0 : 1;
@@ -94,7 +93,8 @@ function xl_cell_to_rowcol($cell) {
  *
  * Returns: a cell reference string in A1 notation.
  */
-function xl_inc_row($cell) {
+function xl_inc_row($cell)
+{
     list($row, $col, $row_abs, $col_abs) = xl_cell_to_rowcol($cell);
     return xl_rowcol_to_cell(++$row, $col, $row_abs, $col_abs);
 }
@@ -106,7 +106,8 @@ function xl_inc_row($cell) {
  *
  * Returns: a cell reference string in A1 notation.
  */
-function xl_dec_row($cell) {
+function xl_dec_row($cell)
+{
     list($row, $col, $row_abs, $col_abs) = xl_cell_to_rowcol($cell);
     return xl_rowcol_to_cell(--$row, $col, $row_abs, $col_abs);
 }
@@ -118,7 +119,8 @@ function xl_dec_row($cell) {
  *
  * Returns: a cell reference string in A1 notation.
  */
-function xl_inc_col($cell) {
+function xl_inc_col($cell)
+{
     list($row, $col, $row_abs, $col_abs) = xl_cell_to_rowcol($cell);
     return xl_rowcol_to_cell($row, ++$col, $row_abs, $col_abs);
 }
@@ -130,14 +132,15 @@ function xl_inc_col($cell) {
  *
  * Returns: a cell reference string in A1 notation.
  */
-function xl_dec_col($cell) {
+function xl_dec_col($cell)
+{
     list($row, $col, $row_abs, $col_abs) = xl_cell_to_rowcol($cell);
     return xl_rowcol_to_cell($row, --$col, $row_abs, $col_abs);
 }
 
 function xl_date_list($year, $month=1, $day=1,
-                      $hour=0, $minute=0, $second=0) {
-
+                      $hour=0, $minute=0, $second=0)
+{
     $monthdays=array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 
     // Leap years since 1900 (year is dividable by 4)
@@ -159,13 +162,13 @@ function xl_date_list($year, $month=1, $day=1,
     // after 28 February 1900; so these two logic errors "neutralize"
     // each other
     if ($year%4==0 && $month<3) {
-      $leapyears--;
+        $leapyears--;
     }
 
     $days=365*($year-1900)+$leapyears-$nonleapyears+$nonnonleapyears;
 
     for ($c=1;$c<$month;$c++) {
-      $days+=$monthdays[$c-1];
+        $days+=$monthdays[$c-1];
     }
 
     // Excel actually wants the days since 31 December 1899, not since
@@ -183,10 +186,9 @@ function xl_date_list($year, $month=1, $day=1,
     return (float)($days+($hour*3600+$minute*60+$second)/86400);
 }
 
-function xl_parse_time($time) {
-
+function xl_parse_time($time)
+{
     if (preg_match('/(\d{1,2}):(\d\d):?((?:\d\d)(?:\.\d+)?)?(?:\s+)?(am|pm)?/i', $time, $reg)) {
-
         $hours       = $reg[1];
         $minutes     = $reg[2];
         $seconds     = $reg[3] || 0;
@@ -204,7 +206,6 @@ function xl_parse_time($time) {
 
         // Calculate the time as a fraction of 24 hours in seconds
         return (float)(($hours*3600+$minutes*60+$seconds)/86400);
-
     } else {
         return false; // Not a valid time string
     }
@@ -214,8 +215,8 @@ function xl_parse_time($time) {
  * Automagically converts almost any date/time string to an Excel date.
  * This function will always only be as good as strtotime() is.
  */
-function xl_parse_date($date) {
-
+function xl_parse_date($date)
+{
     $unixtime=strtotime($date);
 
     $year=date("Y", $unixtime);
@@ -232,7 +233,8 @@ function xl_parse_date($date) {
 /*
  * Dummy function to be "compatible" to Spreadsheet::WriteExcel
  */
-function xl_parse_date_init() {
+function xl_parse_date_init()
+{
     // Erm... do nothing...
     // strtotime() doesn't require anything to be initialized
     // (do not ask me how to set the timezone...)
@@ -248,16 +250,18 @@ function xl_parse_date_init() {
  * - mm/dd/yyyy (english/US/british?)
 */
 
-function xl_decode_date_EU($date) {
+function xl_decode_date_EU($date)
+{
     return xl_parse_date($date);
 }
 
-function xl_decode_date_US($date) {
+function xl_decode_date_US($date)
+{
     return xl_parse_date($date);
 }
 
-function xl_date_1904($exceldate) {
-
+function xl_date_1904($exceldate)
+{
     if ($exceldate < 1462) {
         // date is before 1904
         $exceldate = 0;
@@ -267,5 +271,3 @@ function xl_date_1904($exceldate) {
 
     return $exceldate;
 }
-
-?>

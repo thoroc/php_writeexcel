@@ -9,10 +9,10 @@
 
 set_time_limit(10);
 
-require_once "class.writeexcel_workbook.inc.php";
-require_once "class.writeexcel_worksheet.inc.php";
+require_once('../class.writeexcel_workbook.inc.php');
+require_once('../class.writeexcel_worksheet.inc.php');
 
-$fname = tempnam("/tmp", "colors.xls");
+$fname = tempnam(sys_get_temp_dir(), "colors.xls");
 $workbook = &new writeexcel_workbook($fname);
 
 # Some common formats
@@ -57,7 +57,7 @@ $worksheet1->write(0, 3, "Color", $heading);
 $i = 1;
 
 foreach ($colors as $color=>$index) {
-   $format =& $workbook->addformat(array(
+    $format =& $workbook->addformat(array(
                                         'fg_color' => $color,
                                         'pattern'  => 1,
                                         'border'   => 1
@@ -98,9 +98,9 @@ for ($i=8;$i<=63;$i++) {
 
     # Add the  color names
     foreach ($colors as $color=>$index) {
-      if ($i==$index) {
-        $worksheet2->write(($i -7), 3, $color, $center);
-      }
+        if ($i==$index) {
+            $worksheet2->write(($i -7), 3, $color, $center);
+        }
     }
 }
 
@@ -111,5 +111,3 @@ header("Content-Disposition: inline; filename=\"example-colors.xls\"");
 $fh=fopen($fname, "rb");
 fpassthru($fh);
 unlink($fname);
-
-?>

@@ -1,49 +1,49 @@
 <?php
+/*
+* Copyleft 2002 Johann Hanne
+*
+* This is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or (at your option) any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this software; if not, write to the
+* Free Software Foundation, Inc., 59 Temple Place,
+* Suite 330, Boston, MA  02111-1307 USA
+*/
 
 /*
- * Copyleft 2002 Johann Hanne
- *
- * This is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place,
- * Suite 330, Boston, MA  02111-1307 USA
- */
+* This is the Spreadsheet::WriteExcel Perl package ported to PHP
+* Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
+*/
 
-/*
- * This is the Spreadsheet::WriteExcel Perl package ported to PHP
- * Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
- */
-
-class writeexcel_olewriter {
-    var $_OLEfilename;
-    var $_OLEtmpfilename; /* ABR */
-    var $_filehandle;
-    var $_fileclosed;
-    var $_internal_fh;
-    var $_biff_only;
-    var $_size_allowed;
-    var $_biffsize;
-    var $_booksize;
-    var $_big_blocks;
-    var $_list_blocks;
-    var $_root_start;
-    var $_block_count;
+class writeexcel_olewriter
+{
+    protected $_OLEfilename;
+    public $_OLEtmpfilename; /* ABR */
+    protected $_filehandle;
+    protected $_fileclosed;
+    protected $_internal_fh;
+    protected $_biff_only;
+    protected $_size_allowed;
+    protected $_biffsize;
+    protected $_booksize;
+    protected $_big_blocks;
+    protected $_list_blocks;
+    protected $_root_start;
+    protected $_block_count;
 
     /*
      * Constructor
      */
-    function writeexcel_olewriter($filename) {
-
+    public function writeexcel_olewriter($filename)
+    {
         $this->_OLEfilename  = $filename;
         $this->_filehandle   = false;
         $this->_fileclosed   = 0;
@@ -63,7 +63,8 @@ class writeexcel_olewriter {
     /*
      * Check for a valid filename and store the filehandle.
      */
-    function _initialize() {
+    public function _initialize()
+    {
         $OLEfile = $this->_OLEfilename;
 
         /* Check for a filename. Workbook.pm will catch this first. */
@@ -98,10 +99,11 @@ class writeexcel_olewriter {
      * Set the size of the data to be written to the OLE stream
      *
      * $big_blocks = (109 depot block x (128 -1 marker word)
-     *               - (1 x end words)) = 13842
-     * $maxsize    = $big_blocks * 512 bytes = 7087104
+     *			   - (1 x end words)) = 13842
+     * $maxsize	= $big_blocks * 512 bytes = 7087104
      */
-    function set_size($size) {
+    public function set_size($size)
+    {
         $maxsize = 7087104;
 
         if ($size > $maxsize) {
@@ -126,7 +128,8 @@ class writeexcel_olewriter {
     /*
      * Calculate various sizes needed for the OLE stream
      */
-    function _calculate_sizes() {
+    public function _calculate_sizes()
+    {
         $datasize = $this->_booksize;
 
         if ($datasize % 512 == 0) {
@@ -139,7 +142,7 @@ class writeexcel_olewriter {
         $this->_list_blocks = floor(($this->_big_blocks)/127)+1;
         $this->_root_start  = $this->_big_blocks;
 
-        //print $this->_biffsize.    "\n";
+        //print $this->_biffsize.	"\n";
         //print $this->_big_blocks.  "\n";
         //print $this->_list_blocks. "\n";
     }
@@ -149,8 +152,8 @@ class writeexcel_olewriter {
      * This method must be called so that the file contents are
      * actually written.
      */
-    function close() {
-
+    public function close()
+    {
         if (!$this->_size_allowed) {
             return;
         }
@@ -182,14 +185,16 @@ class writeexcel_olewriter {
     /*
      * Write BIFF data to OLE file.
      */
-    function write($data) {
+    public function write($data)
+    {
         fputs($this->_filehandle, $data);
     }
 
     /*
      * Write OLE header block.
      */
-    function write_header() {
+    public function write_header()
+    {
         if ($this->_biff_only) {
             return;
         }
@@ -210,7 +215,7 @@ class writeexcel_olewriter {
         $root_startblock = pack("V",    $root_start);
         $unknown6        = pack("VV",   0x00, 0x1000);
         $sbd_startblock  = pack("V",    -2);
-        $unknown7        = pack("VVV",  0x00, -2 ,0x00);
+        $unknown7        = pack("VVV",  0x00, -2, 0x00);
         $unused          = pack("V",    -1);
 
         fputs($this->_filehandle, $id);
@@ -238,7 +243,8 @@ class writeexcel_olewriter {
     /*
      * Write big block depot.
      */
-    function _write_big_block_depot() {
+    public function _write_big_block_depot()
+    {
         $num_blocks   = $this->_big_blocks;
         $num_lists    = $this->_list_blocks;
         $total_blocks = $num_lists * 128;
@@ -267,11 +273,12 @@ class writeexcel_olewriter {
     /*
      * Write property storage. TODO: add summary sheets
      */
-    function _write_property_storage() {
+    public function _write_property_storage()
+    {
         $rootsize = -2;
         $booksize = $this->_booksize;
 
-        //                name          type  dir start  size
+        //				name		  type  dir start  size
         $this->_write_pps('Root Entry', 0x05,   1,   -2, 0x00);
         $this->_write_pps('Book',       0x02,  -1, 0x00, $booksize);
         $this->_write_pps('',           0x00,  -1, 0x00, 0x0000);
@@ -281,7 +288,8 @@ class writeexcel_olewriter {
     /*
      * Write property sheet in property storage
      */
-    function _write_pps($name, $type, $dir, $start, $size) {
+    public function _write_pps($name, $type, $dir, $start, $size)
+    {
         $names           = array();
         $length          = 0;
 
@@ -333,7 +341,8 @@ class writeexcel_olewriter {
     /*
      * Pad the end of the file
      */
-    function _write_padding() {
+    public function _write_padding()
+    {
         $biffsize = $this->_biffsize;
 
         if ($biffsize < 4096) {
@@ -347,7 +356,4 @@ class writeexcel_olewriter {
             fputs($this->_filehandle, str_repeat("\0", $padding));
         }
     }
-
 }
-
-?>

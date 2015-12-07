@@ -1,43 +1,43 @@
 <?php
+/*
+* Copyleft 2002 Johann Hanne
+*
+* This is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or (at your option) any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this software; if not, write to the
+* Free Software Foundation, Inc., 59 Temple Place,
+* Suite 330, Boston, MA  02111-1307 USA
+*/
 
 /*
- * Copyleft 2002 Johann Hanne
- *
- * This is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place,
- * Suite 330, Boston, MA  02111-1307 USA
- */
+* This is the Spreadsheet::WriteExcel Perl package ported to PHP
+* Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
+*/
 
-/*
- * This is the Spreadsheet::WriteExcel Perl package ported to PHP
- * Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
- */
-
-class writeexcel_biffwriter {
-    var $byte_order;
-    var $BIFF_version;
-    var $_byte_order;
-    var $_data;
-    var $_datasize;
-    var $_limit;
-    var $_debug;
+class writeexcel_biffwriter
+{
+    protected $byte_order;
+    protected $BIFF_version;
+    protected $_byte_order;
+    protected $_data;
+    protected $_datasize;
+    protected $_limit;
+    protected $_debug;
 
     /*
-     * Constructor
-     */
-    function writeexcel_biffwriter() {
-
+    * Constructor
+    */
+    public function writeexcel_biffwriter()
+    {
         $this->byte_order   = '';
         $this->BIFF_version = 0x0500;
         $this->_byte_order  = '';
@@ -49,10 +49,11 @@ class writeexcel_biffwriter {
     }
 
     /*
-     * Determine the byte order and store it as class data to avoid
-     * recalculating it for each call to new().
-     */
-    function _set_byte_order() {
+    * Determine the byte order and store it as class data to avoid
+    * recalculating it for each call to new().
+    */
+    public function _set_byte_order()
+    {
         $this->byteorder=0;
         // Check if "pack" gives the required IEEE 64bit float
         $teststr = pack("d", 1.2345);
@@ -73,10 +74,10 @@ class writeexcel_biffwriter {
     }
 
     /*
-     * General storage function
-     */
-    function _prepend($data) {
-
+    * General storage function
+    */
+    public function _prepend($data)
+    {
         if (func_num_args()>1) {
             trigger_error("writeexcel_biffwriter::_prepend() ".
                           "called with more than one argument", E_USER_ERROR);
@@ -102,10 +103,10 @@ class writeexcel_biffwriter {
     }
 
     /*
-     * General storage function
-     */
-    function _append($data) {
-
+    * General storage function
+    */
+    public function _append($data)
+    {
         if (func_num_args()>1) {
             trigger_error("writeexcel_biffwriter::_append() ".
                           "called with more than one argument", E_USER_ERROR);
@@ -131,14 +132,14 @@ class writeexcel_biffwriter {
     }
 
     /*
-     * Writes Excel BOF record to indicate the beginning of a stream or
-     * sub-stream in the BIFF file.
-     *
-     * $type = 0x0005, Workbook
-     * $type = 0x0010, Worksheet
-     */
-    function _store_bof($type) {
-
+    * Writes Excel BOF record to indicate the beginning of a stream or
+    * sub-stream in the BIFF file.
+    *
+    * $type = 0x0005, Workbook
+    * $type = 0x0010, Worksheet
+    */
+    public function _store_bof($type)
+    {
         $record  = 0x0809; // Record identifier
         $length  = 0x0008; // Number of bytes to follow
 
@@ -157,10 +158,10 @@ class writeexcel_biffwriter {
     }
 
     /*
-     * Writes Excel EOF record to indicate the end of a BIFF stream.
-     */
-    function _store_eof() {
-
+    * Writes Excel EOF record to indicate the end of a BIFF stream.
+    */
+    public function _store_eof()
+    {
         $record = 0x000A; // Record identifier
         $length = 0x0000; // Number of bytes to follow
 
@@ -170,15 +171,15 @@ class writeexcel_biffwriter {
     }
 
     /*
-     * Excel limits the size of BIFF records. In Excel 5 the limit is 2084
-     * bytes. In Excel 97 the limit is 8228 bytes. Records that are longer
-     * than these limits must be split up into CONTINUE blocks.
-     *
-     * This function take a long BIFF record and inserts CONTINUE records as
-     * necessary.
-     */
-    function _add_continue($data) {
-
+    * Excel limits the size of BIFF records. In Excel 5 the limit is 2084
+    * bytes. In Excel 97 the limit is 8228 bytes. Records that are longer
+    * than these limits must be split up into CONTINUE blocks.
+    *
+    * This function take a long BIFF record and inserts CONTINUE records as
+    * necessary.
+    */
+    public function _add_continue($data)
+    {
         $limit  = $this->_limit;
         $record = 0x003C; // Record identifier
 
@@ -186,7 +187,7 @@ class writeexcel_biffwriter {
         // the length field of the record.
         $tmp = substr($data, 0, $limit);
         $data = substr($data, $limit);
-        $tmp = substr($tmp, 0, 2) . pack ("v", $limit-4) . substr($tmp, 4);
+        $tmp = substr($tmp, 0, 2) . pack("v", $limit-4) . substr($tmp, 4);
 
         // Strip out chunks of 2080/8224 bytes +4 for the header.
         while (strlen($data) > $limit) {
@@ -203,7 +204,4 @@ class writeexcel_biffwriter {
 
         return $tmp;
     }
-
 }
-
-?>

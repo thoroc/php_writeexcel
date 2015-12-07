@@ -1,69 +1,70 @@
 <?php
+/*
+* Copyleft 2002 Johann Hanne
+*
+* This is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or (at your option) any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this software; if not, write to the
+* Free Software Foundation, Inc., 59 Temple Place,
+* Suite 330, Boston, MA  02111-1307 USA
+*/
 
 /*
- * Copyleft 2002 Johann Hanne
- *
- * This is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place,
- * Suite 330, Boston, MA  02111-1307 USA
- */
+* This is the Spreadsheet::WriteExcel Perl package ported to PHP
+* Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
+*/
 
-/*
- * This is the Spreadsheet::WriteExcel Perl package ported to PHP
- * Spreadsheet::WriteExcel was written by John McNamara, jmcnamara@cpan.org
- */
+class writeexcel_format
+{
 
-class writeexcel_format {
-
-    var $_xf_index;
-    var $_font_index;
-    var $_font;
-    var $_size;
-    var $_bold;
-    var $_italic;
-    var $_color;
-    var $_underline;
-    var $_font_strikeout;
-    var $_font_outline;
-    var $_font_shadow;
-    var $_font_script;
-    var $_font_family;
-    var $_font_charset;
-    var $_num_format;
-    var $_hidden;
-    var $_locked;
-    var $_text_h_align;
-    var $_text_wrap;
-    var $_text_v_align;
-    var $_text_justlast;
-    var $_rotation;
-    var $_fg_color;
-    var $_bg_color;
-    var $_pattern;
-    var $_bottom;
-    var $_top;
-    var $_left;
-    var $_right;
-    var $_bottom_color;
-    var $_top_color;
-    var $_left_color;
-    var $_right_color;
+    protected $_xf_index;
+    public $_font_index;
+    protected $_font;
+    protected $_size;
+    protected $_bold;
+    protected $_italic;
+    protected $_color;
+    protected $_underline;
+    protected $_font_strikeout;
+    protected $_font_outline;
+    protected $_font_shadow;
+    protected $_font_script;
+    protected $_font_family;
+    protected $_font_charset;
+    public $_num_format;
+    protected $_hidden;
+    protected $_locked;
+    protected $_text_h_align;
+    protected $_text_wrap;
+    protected $_text_v_align;
+    protected $_text_justlast;
+    protected $_rotation;
+    protected $_fg_color;
+    protected $_bg_color;
+    protected $_pattern;
+    protected $_bottom;
+    protected $_top;
+    protected $_left;
+    protected $_right;
+    protected $_bottom_color;
+    protected $_top_color;
+    protected $_left_color;
+    protected $_right_color;
 
     /*
-     * Constructor
-     */
-    function writeexcel_format() {
+    * Constructor
+    */
+    public function writeexcel_format()
+    {
         $_=func_get_args();
 
         $this->_xf_index       = (sizeof($_)>0) ? array_shift($_) : 0;
@@ -115,32 +116,33 @@ class writeexcel_format {
     }
 
     /*
-     * Copy the attributes of another writeexcel_format object.
-     */
-    function copy($other) {
+    * Copy the attributes of another writeexcel_format object.
+    */
+    public function copy($other)
+    {
         $xf = $this->_xf_index;   // Backup XF index
         foreach ($other as $key->$value) {
-                $this->{$key} = $value;
+            $this->{$key} = $value;
         }
         $this->_xf_index = $xf;   // Restore XF index
     }
 
     /*
-     * Generate an Excel BIFF XF record.
-     */
-    function get_xf() {
-
+    * Generate an Excel BIFF XF record.
+    */
+    public function get_xf()
+    {
         $_=func_get_args();
 
-        // $record    Record identifier
-        // $length    Number of bytes to follow
+        // $record	Record identifier
+        // $length	Number of bytes to follow
 
-        // $ifnt      Index to FONT record
-        // $ifmt      Index to FORMAT record
-        // $style     Style and other options
-        // $align     Alignment
-        // $icv       fg and bg pattern colors
-        // $fill      Fill and border line style
+        // $ifnt	  Index to FONT record
+        // $ifmt	  Index to FORMAT record
+        // $style	 Style and other options
+        // $align	 Alignment
+        // $icv	   fg and bg pattern colors
+        // $fill	  Fill and border line style
         // $border1   Border line style and color
         // $border2   Border color
 
@@ -166,12 +168,24 @@ class writeexcel_format {
         $atr_prot    = 0;
 
         // Reset the default colors for the non-font properties
-        if ($this->_fg_color     == 0x7FFF) $this->_fg_color     = 0x40;
-        if ($this->_bg_color     == 0x7FFF) $this->_bg_color     = 0x41;
-        if ($this->_bottom_color == 0x7FFF) $this->_bottom_color = 0x41;
-        if ($this->_top_color    == 0x7FFF) $this->_top_color    = 0x41;
-        if ($this->_left_color   == 0x7FFF) $this->_left_color   = 0x41;
-        if ($this->_right_color  == 0x7FFF) $this->_right_color  = 0x41;
+        if ($this->_fg_color     == 0x7FFF) {
+            $this->_fg_color     = 0x40;
+        }
+        if ($this->_bg_color     == 0x7FFF) {
+            $this->_bg_color     = 0x41;
+        }
+        if ($this->_bottom_color == 0x7FFF) {
+            $this->_bottom_color = 0x41;
+        }
+        if ($this->_top_color    == 0x7FFF) {
+            $this->_top_color    = 0x41;
+        }
+        if ($this->_left_color   == 0x7FFF) {
+            $this->_left_color   = 0x41;
+        }
+        if ($this->_right_color  == 0x7FFF) {
+            $this->_right_color  = 0x41;
+        }
 
         // Zero the default border colour if the border has not been set.
         if ($this->_bottom == 0) {
@@ -187,17 +201,16 @@ class writeexcel_format {
             $this->_left_color   = 0;
         }
 
-        // The following 2 logical statements take care of special cases in 
+        // The following 2 logical statements take care of special cases in
         // relation to cell colors and patterns:
         // 1. For a solid fill (_pattern == 1) Excel reverses the role of
-        //    foreground and background colors
+        //	foreground and background colors
         // 2. If the user specifies a foreground or background color
-        //    without a pattern they probably wanted a solid fill, so we
-        //    fill in the defaults.
-        if ($this->_pattern <= 0x01 && 
-            $this->_bg_color != 0x41 && 
-            $this->_fg_color == 0x40 )
-        {
+        //	without a pattern they probably wanted a solid fill, so we
+        //	fill in the defaults.
+        if ($this->_pattern <= 0x01 &&
+            $this->_bg_color != 0x41 &&
+            $this->_fg_color == 0x40) {
             $this->_fg_color = $this->_bg_color;
             $this->_bg_color = 0x40;
             $this->_pattern  = 1;
@@ -205,8 +218,7 @@ class writeexcel_format {
 
         if ($this->_pattern <= 0x01 &&
             $this->_bg_color == 0x41 &&
-            $this->_fg_color != 0x40 )
-        {
+            $this->_fg_color != 0x40) {
             $this->_bg_color = 0x40;
             $this->_pattern  = 1;
         }
@@ -253,24 +265,25 @@ class writeexcel_format {
     }
 
     /*
-     * Generate an Excel BIFF FONT record.
-     */
-    function get_font() {
+    * Generate an Excel BIFF FONT record.
+    */
+    public function get_font()
+    {
 
-        // $record     Record identifier
-        // $length     Record length
+        // $record	 Record identifier
+        // $length	 Record length
 
         // $dyHeight   Height of font (1/20 of a point)
-        // $grbit      Font attributes
-        // $icv        Index to color palette
-        // $bls        Bold style
-        // $sss        Superscript/subscript
-        // $uls        Underline
-        // $bFamily    Font family
+        // $grbit	  Font attributes
+        // $icv		Index to color palette
+        // $bls		Bold style
+        // $sss		Superscript/subscript
+        // $uls		Underline
+        // $bFamily	Font family
         // $bCharSet   Character set
         // $reserved   Reserved
-        // $cch        Length of font name
-        // $rgch       Font name
+        // $cch		Length of font name
+        // $rgch	   Font name
 
         $dyHeight   = $this->_size * 20;
         $icv        = $this->_color;
@@ -313,10 +326,11 @@ class writeexcel_format {
     }
 
     /*
-     * Returns a unique hash key for a font.
-     * Used by writeexcel_workbook::_store_all_fonts()
-     */
-    function get_font_key() {
+    * Returns a unique hash key for a font.
+    * Used by writeexcel_workbook::_store_all_fonts()
+    */
+    public function get_font_key()
+    {
 
         # The following elements are arranged to increase the probability of
         # generating a unique key. Elements that hold a large range of numbers
@@ -334,19 +348,20 @@ class writeexcel_format {
     }
 
     /*
-     * Returns the used by Worksheet->_XF()
-     */
-    function get_xf_index() {
+    * Returns the used by Worksheet->_XF()
+    */
+    public function get_xf_index()
+    {
         return $this->_xf_index;
     }
 
     /*
-     * Used in conjunction with the set_xxx_color methods to convert a color
-     * string into a number. Color range is 0..63 but we will restrict it
-     * to 8..63 to comply with Gnumeric. Colors 0..7 are repeated in 8..15.
-     */
-    function _get_color($color=false) {
-
+    * Used in conjunction with the set_xxx_color methods to convert a color
+    * string into a number. Color range is 0..63 but we will restrict it
+    * to 8..63 to comply with Gnumeric. Colors 0..7 are repeated in 8..15.
+    */
+    public function _get_color($color=false)
+    {
         $colors = array(
                         'aqua'    => 0x0F,
                         'cyan'    => 0x0F,
@@ -398,9 +413,10 @@ class writeexcel_format {
     }
 
     /*
-     * Set cell alignment.
-     */
-    function set_align($location) {
+    * Set cell alignment.
+    */
+    public function set_align($location)
+    {
 
         // Ignore numbers
         if (preg_match('/\d/', $location)) {
@@ -465,26 +481,28 @@ class writeexcel_format {
     }
 
     /*
-     * Set vertical cell alignment. This is required by the set_properties()
-     * method to differentiate between the vertical and horizontal properties.
-     */
-    function set_valign($location) {
+    * Set vertical cell alignment. This is required by the set_properties()
+    * method to differentiate between the vertical and horizontal properties.
+    */
+    public function set_valign($location)
+    {
         $this->set_align($location);
     }
 
     /*
-     * This is an alias for the unintuitive set_align('merge')
-     */
-    function set_merge() {
+    * This is an alias for the unintuitive set_align('merge')
+    */
+    public function set_merge()
+    {
         $this->set_text_h_align(6);
     }
 
     /*
-     * Bold has a range 0x64..0x3E8.
-     * 0x190 is normal. 0x2BC is bold.
-     */
-    function set_bold($weight=1) {
-
+    * Bold has a range 0x64..0x3E8.
+    * 0x190 is normal. 0x2BC is bold.
+    */
+    public function set_bold($weight=1)
+    {
         if ($weight == 1) {
             // Bold text
             $weight = 0x2BC;
@@ -509,9 +527,10 @@ class writeexcel_format {
     }
 
     /*
-     * Set all cell borders (bottom, top, left, right) to the same style
-     */
-    function set_border($style) {
+    * Set all cell borders (bottom, top, left, right) to the same style
+    */
+    public function set_border($style)
+    {
         $this->set_bottom($style);
         $this->set_top($style);
         $this->set_left($style);
@@ -519,9 +538,10 @@ class writeexcel_format {
     }
 
     /*
-     * Set all cell borders (bottom, top, left, right) to the same color
-     */
-    function set_border_color($color) {
+    * Set all cell borders (bottom, top, left, right) to the same color
+    */
+    public function set_border_color($color)
+    {
         $this->set_bottom_color($color);
         $this->set_top_color($color);
         $this->set_left_color($color);
@@ -529,14 +549,14 @@ class writeexcel_format {
     }
 
     /*
-     * Convert hashes of properties to method calls.
-     */
-    function set_properties() {
-
+    * Convert hashes of properties to method calls.
+    */
+    public function set_properties()
+    {
         $_=func_get_args();
 
         $properties=array();
-        foreach($_ as $props) {
+        foreach ($_ as $props) {
             if (is_array($props)) {
                 $properties=array_merge($properties, $props);
             } else {
@@ -556,140 +576,175 @@ class writeexcel_format {
                               E_USER_ERROR);
             }
 
+            // Un-camelcase (for compatibility with PEAR Spreadsheet_Excel_Writer property names)
+            if ($key === 'FontFamily') {
+                $key = 'font';
+            } else {
+                $key = strtolower(preg_replace('/([a-z])([A-Z])/', '${1}_${2}', $key));
+            }
+
             /* Evaling all $values as a strings gets around the problem of
                some numerical format strings being evaluated as numbers, for
                example "00000" for a zip code. */
             if (is_int($key)) {
-                eval("\$this->set_$value();");
+                $method = 'set_' . $value;
+                $this->$method();
             } else {
-                eval("\$this->set_$key('$value');");
+                $method = 'set_' . $key;
+                $this->$method($value);
             }
-
         }
     }
 
-    function set_font($font) {
+    public function set_font($font)
+    {
         $this->_font=$font;
     }
 
-    function set_size($size) {
+    public function set_size($size)
+    {
         $this->_size=$size;
     }
 
-    function set_italic($italic=1) {
+    public function set_italic($italic=1)
+    {
         $this->_italic=$italic;
     }
 
-    function set_color($color) {
+    public function set_color($color)
+    {
         $this->_color=$this->_get_color($color);
     }
 
-    function set_underline($underline=1) {
+    public function set_underline($underline=1)
+    {
         $this->_underline=$underline;
     }
 
-    function set_font_strikeout($font_strikeout=1) {
+    public function set_font_strikeout($font_strikeout=1)
+    {
         $this->_font_strikeout=$font_strikeout;
     }
 
-    function set_font_outline($font_outline=1) {
+    public function set_font_outline($font_outline=1)
+    {
         $this->_font_outline=$font_outline;
     }
 
-    function set_font_shadow($font_shadow=1) {
+    public function set_font_shadow($font_shadow=1)
+    {
         $this->_font_shadow=$font_shadow;
     }
 
-    function set_font_script($font_script=1) {
+    public function set_font_script($font_script=1)
+    {
         $this->_font_script=$font_script;
     }
 
     /* Undocumented */
-    function set_font_family($font_family=1) {
+    public function set_font_family($font_family=1)
+    {
         $this->_font_family=$font_family;
     }
 
     /* Undocumented */
-    function set_font_charset($font_charset=1) {
+    public function set_font_charset($font_charset=1)
+    {
         $this->_font_charset=$font_charset;
     }
 
-    function set_num_format($num_format=1) {
+    public function set_num_format($num_format=1)
+    {
         $this->_num_format=$num_format;
     }
 
-    function set_hidden($hidden=1) {
+    public function set_hidden($hidden=1)
+    {
         $this->_hidden=$hidden;
     }
 
-    function set_locked($locked=1) {
+    public function set_locked($locked=1)
+    {
         $this->_locked=$locked;
     }
 
-    function set_text_h_align($align) {
+    public function set_text_h_align($align)
+    {
         $this->_text_h_align=$align;
     }
 
-    function set_text_wrap($wrap=1) {
+    public function set_text_wrap($wrap=1)
+    {
         $this->_text_wrap=$wrap;
     }
 
-    function set_text_v_align($align) {
+    public function set_text_v_align($align)
+    {
         $this->_text_v_align=$align;
     }
 
-    function set_text_justlast($text_justlast=1) {
+    public function set_text_justlast($text_justlast=1)
+    {
         $this->_text_justlast=$text_justlast;
     }
 
-    function set_rotation($rotation=1) {
+    public function set_rotation($rotation=1)
+    {
         $this->_rotation=$rotation;
     }
 
-    function set_fg_color($color) {
+    public function set_fg_color($color)
+    {
         $this->_fg_color=$this->_get_color($color);
     }
 
-    function set_bg_color($color) {
+    public function set_bg_color($color)
+    {
         $this->_bg_color=$this->_get_color($color);
     }
 
-    function set_pattern($pattern=1) {
+    public function set_pattern($pattern=1)
+    {
         $this->_pattern=$pattern;
     }
 
-    function set_bottom($bottom=1) {
+    public function set_bottom($bottom=1)
+    {
         $this->_bottom=$bottom;
     }
 
-    function set_top($top=1) {
+    public function set_top($top=1)
+    {
         $this->_top=$top;
     }
 
-    function set_left($left=1) {
+    public function set_left($left=1)
+    {
         $this->_left=$left;
     }
 
-    function set_right($right=1) {
-         $this->_right=$right;
+    public function set_right($right=1)
+    {
+        $this->_right=$right;
     }
 
-    function set_bottom_color($color) {
+    public function set_bottom_color($color)
+    {
         $this->_bottom_color=$this->_get_color($color);
     }
 
-    function set_top_color($color) {
+    public function set_top_color($color)
+    {
         $this->_top_color=$this->_get_color($color);
     }
 
-    function set_left_color($color) {
+    public function set_left_color($color)
+    {
         $this->_left_color=$this->_get_color($color);
     }
 
-    function set_right_color($color) {
+    public function set_right_color($color)
+    {
         $this->_right_color=$this->_get_color($color);
     }
-
 }
-
-?>

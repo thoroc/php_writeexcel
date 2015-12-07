@@ -2,10 +2,10 @@
 
 set_time_limit(10);
 
-require_once "class.writeexcel_workbook.inc.php";
-require_once "class.writeexcel_worksheet.inc.php";
+require_once('../class.writeexcel_workbook.inc.php');
+require_once('../class.writeexcel_worksheet.inc.php');
 
-$fname = tempnam("/tmp", "stocks.xls");
+$fname = tempnam(sys_get_temp_dir(), "stocks.xls");
 $workbook = &new writeexcel_workbook($fname);
 $worksheet =& $workbook->addworksheet();
 
@@ -45,17 +45,17 @@ $worksheet->write(0, 1, 'Price',   $header);
 $worksheet->write(0, 2, 'Volume',  $header);
 $worksheet->write(0, 3, 'Change',  $header);
 
-$worksheet->write(1, 0, 'Damage Inc.'     );
+$worksheet->write(1, 0, 'Damage Inc.');
 $worksheet->write(1, 1, 30.25,     $f_price);  # $30.25
 $worksheet->write(1, 2, 1234567,   $f_volume); # 1,234,567
 $worksheet->write(1, 3, 0.085,     $f_change); # 8.5% in green
 
-$worksheet->write(2, 0, 'Dump Corp.'      );
+$worksheet->write(2, 0, 'Dump Corp.');
 $worksheet->write(2, 1, 1.56,      $f_price);  # $1.56
 $worksheet->write(2, 2, 7564,      $f_volume); # 7,564
 $worksheet->write(2, 3, -0.015,    $f_change); # -1.5% in red
 
-$worksheet->write(3, 0, 'Rev Ltd.'        );
+$worksheet->write(3, 0, 'Rev Ltd.');
 $worksheet->write(3, 1, 0.13,      $f_price);  # $0.13
 $worksheet->write(3, 2, 321,       $f_volume); # 321
 $worksheet->write(3, 3, 0,         $f_change); # 0 in the font color (black)
@@ -67,5 +67,3 @@ header("Content-Disposition: inline; filename=\"example-stocks.xls\"");
 $fh=fopen($fname, "rb");
 fpassthru($fh);
 unlink($fname);
-
-?>
