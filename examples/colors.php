@@ -9,10 +9,10 @@
 
 set_time_limit(10);
 
-require_once "class.writeexcel_workbook.inc.php";
-require_once "class.writeexcel_worksheet.inc.php";
+require_once('../class.writeexcel_workbook.inc.php');
+require_once('../class.writeexcel_worksheet.inc.php');
 
-$fname = tempnam("/tmp", "colors.xls");
+$fname = tempnam(sys_get_temp_dir(), "colors.xls");
 $workbook = &new writeexcel_workbook($fname);
 
 # Some common formats
@@ -111,5 +111,3 @@ header("Content-Disposition: inline; filename=\"example-colors.xls\"");
 $fh=fopen($fname, "rb");
 fpassthru($fh);
 unlink($fname);
-
-?>

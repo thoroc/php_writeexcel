@@ -2,10 +2,10 @@
 
 set_time_limit(300);
 
-require_once "class.writeexcel_workbookbig.inc.php";
-require_once "class.writeexcel_worksheet.inc.php";
+require_once('../class.writeexcel_workbookbig.inc.php');
+require_once('../class.writeexcel_worksheet.inc.php');
 
-$fname = tempnam("/tmp", "bigfile.xls");
+$fname = tempnam(sys_get_temp_dir(), "bigfile.xls");
 $workbook = &new writeexcel_workbookbig($fname);
 $worksheet = &$workbook->addworksheet();
 
@@ -24,5 +24,3 @@ header("Content-Disposition: inline; filename=\"example-bigfile.xls\"");
 $fh=fopen($fname, "rb");
 fpassthru($fh);
 unlink($fname);
-
-?>

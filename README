@@ -10,12 +10,12 @@ Where to start
 --------------
 I've included six example PHP scripts which are also taken out of the
 Spreadsheet::WriteExcel package and ported to PHP:
-- example-simple.php
-- example-merge2.php
-- example-stocks.php
-- example-textwrap.php
-- example-demo.php
-- example-bigfile.php
+- examples/simple.php
+- examples/merge2.php
+- examples/stocks.php
+- examples/textwrap.php
+- examples/demo.php
+- examples/bigfile.php
 All you have to do is to tar xzvf the package to a directory accessible
 via a web server. Then fetch any of the example scripts with your
 favourite web browser and Excel should come into place and show you
