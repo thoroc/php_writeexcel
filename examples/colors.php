@@ -57,7 +57,7 @@ $worksheet1->write(0, 3, "Color", $heading);
 $i = 1;
 
 foreach ($colors as $color=>$index) {
-   $format =& $workbook->addformat(array(
+    $format =& $workbook->addformat(array(
                                         'fg_color' => $color,
                                         'pattern'  => 1,
                                         'border'   => 1
@@ -98,9 +98,9 @@ for ($i=8;$i<=63;$i++) {
 
     # Add the  color names
     foreach ($colors as $color=>$index) {
-      if ($i==$index) {
-        $worksheet2->write(($i -7), 3, $color, $center);
-      }
+        if ($i==$index) {
+            $worksheet2->write(($i -7), 3, $color, $center);
+        }
     }
 }
 

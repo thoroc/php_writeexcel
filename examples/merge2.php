@@ -46,7 +46,7 @@ $border2->set_align('vcenter');
 $border2->set_merge(); # This is the key feature
 
 # Only one cell should contain text, the others should be blank.
-$worksheet->write      (2, 1, "Merged Cells", $border1);
+$worksheet->write(2, 1, "Merged Cells", $border1);
 $worksheet->write_blank(2, 2,                 $border2);
 
 $workbook->close();

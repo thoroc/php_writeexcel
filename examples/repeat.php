@@ -15,7 +15,7 @@ $worksheet->write(0, 0, "Header line (will be repeated when printed)");
 $worksheet->write(1, 0, "Header line number 2");
 
 for ($i=1;$i<=100;$i++) {
-  $worksheet->write($i+1, 0, "Line $i");
+    $worksheet->write($i+1, 0, "Line $i");
 }
 
 $workbook->close();
