@@ -44,3 +44,13 @@ php_writeexcel: 2.065
 So clearly, PEAR's Spreadsheet_Excel_Writer is almost twice as fast.
 PHPExcel is more modern, but by far the slowest and consumes huge amounts of memory,
 which is the only reason I tried with this library, updating it slightly in the process.
+
+Original Documentation
+======================
+
+ * [README](doc/README)
+ * [LICENSE](doc/LICENSE)
+ * [FAQ](doc/FAQ)
+ * [TODO](doc/TODO)
+ * [CONTRIBUTION](doc/THANKS)
+ * [CHANGELGO](doc/CHANGELOG)

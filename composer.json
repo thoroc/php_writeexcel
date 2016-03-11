@@ -25,12 +25,12 @@
     "autoload": {
         "psr-0": { },
         "files": [
-            "class.writeexcel_biffwriter.inc.php",
-            "class.writeexcel_format.inc.php",
-            "class.writeexcel_formula.inc.php",
-            "class.writeexcel_olewriter.inc.php",
-            "class.writeexcel_workbook.inc.php",
-            "class.writeexcel_worksheet.inc.php"
+            "src/class.writeexcel_biffwriter.inc.php",
+            "src/class.writeexcel_format.inc.php",
+            "src/class.writeexcel_formula.inc.php",
+            "src/class.writeexcel_olewriter.inc.php",
+            "src/class.writeexcel_workbook.inc.php",
+            "src/class.writeexcel_worksheet.inc.php"
         ]
     }
 }
