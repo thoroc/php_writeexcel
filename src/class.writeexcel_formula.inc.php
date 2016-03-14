@@ -95,7 +95,7 @@ class writeexcel_formula
     #
     # Constructor
     #
-    public function writeexcel_formula($byte_order)
+    public function __construct($byte_order)
     {
         $this->parser            = false;
         $this->ptg                = array();
@@ -1393,7 +1393,7 @@ class writeexcel_formula
                     $this->_advance();  // eat the ","
                 } else {
                     trigger_error("Sintactic error: coma expected in ".
-                                    "function $function, {$num_args}º arg", E_USER_ERROR);
+                                    "function $function, {$num_args}ï¿½ arg", E_USER_ERROR);
                 }
                 $result2 = $this->_condition();
                 if ($this->isError($result2)) {

@@ -63,7 +63,7 @@ class writeexcel_format
     /*
     * Constructor
     */
-    public function writeexcel_format()
+    public function __construct()
     {
         $_=func_get_args();
 

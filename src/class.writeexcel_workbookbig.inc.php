@@ -30,9 +30,9 @@ require_once('class.ole_pps_file.php');
 class writeexcel_workbookbig extends writeexcel_workbook
 {
 
-    public function writeexcel_workbookbig($filename)
+    public function __construct($filename)
     {
-        $this->writeexcel_workbook($filename);
+        parent::__construct($filename);
     }
 
     public function _store_OLE_file()

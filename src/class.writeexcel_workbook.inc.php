@@ -113,7 +113,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $this->_debug && error_log(__METHOD__ . sprintf(' filename: (%s) %s', gettype($filename), $filename));
 
         // Original code starts here:
-        $this->writeexcel_biffwriter();
+        parent::__construct();
 
         $tmp_format  = new writeexcel_format();
         $byte_order  = $this->_byte_order;

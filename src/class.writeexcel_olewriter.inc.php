@@ -42,7 +42,7 @@ class writeexcel_olewriter
     /*
      * Constructor
      */
-    public function writeexcel_olewriter($filename)
+    public function __construct($filename)
     {
         $this->_OLEfilename  = $filename;
         $this->_filehandle   = false;

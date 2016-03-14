@@ -110,7 +110,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
     public function writeexcel_worksheet($name, $index, &$activesheet, &$firstsheet,
                                 &$url_format, &$parser, $tempdir)
     {
-        $this->writeexcel_biffwriter();
+        parent::__construct();
 
         $rowmax                = 65536; // 16384 in Excel 5
         $colmax                = 256;
