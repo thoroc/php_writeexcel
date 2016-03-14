@@ -278,7 +278,7 @@ class writeexcel_olewriter
         $rootsize = -2;
         $booksize = $this->_booksize;
 
-        //				name		  type  dir start  size
+        //                 name         type  dir start  size
         $this->_write_pps('Root Entry', 0x05,   1,   -2, 0x00);
         $this->_write_pps('Book',       0x02,  -1, 0x00, $booksize);
         $this->_write_pps('',           0x00,  -1, 0x00, 0x0000);
