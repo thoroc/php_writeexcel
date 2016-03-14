@@ -72,6 +72,13 @@ call_user_func(function () {
     }
 });
 
+/**
+ * Class for parsing Excel formulas.
+ *
+ * @author   Xavier Noguer <xnoguer@rezebra.com>
+ *
+ * @category FileFormats
+ */
 class writeexcel_formula
 {
     protected $parser;
@@ -129,6 +136,8 @@ class writeexcel_formula
      *
      * This is the only public method. It takes a textual description of a formula
      * and returns a RPN encoded byte string.
+     * 
+     * @return string
      */
     public function parse_formula()
     {
@@ -166,14 +175,6 @@ class writeexcel_formula
                 (get_class($data) == 'pear_error' ||
                 is_subclass_of($data, 'pear_error')));
     }
-
-    /**
-     * Class for parsing Excel formulas.
-     *
-     * @author   Xavier Noguer <xnoguer@rezebra.com>
-     *
-     * @category FileFormats
-     */
 
     /**
      * Initialize the ptg and function hashes. 
