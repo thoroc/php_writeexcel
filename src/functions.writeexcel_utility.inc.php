@@ -33,7 +33,7 @@ function xl_rowcol_to_cell($row, $col, $row_abs = false, $col_abs = false)
     $row_abs = $row_abs ? '$' : '';
     $col_abs = $col_abs ? '$' : '';
 
-    $int = floor($col / 26);
+    $int  = floor($col / 26);
     $frac = $col % 26;
 
     $chr1 = ''; // Most significant character in AA1
@@ -64,15 +64,15 @@ function xl_cell_to_rowcol($cell)
     preg_match('/(\$?)([A-I]?[A-Z])(\$?)(\d+)/', $cell, $reg);
 
     $col_abs = ($reg[1] == '') ? 0 : 1;
-    $col = $reg[2];
+    $col     = $reg[2];
     $row_abs = ($reg[3] == '') ? 0 : 1;
-    $row = $reg[4];
+    $row     = $reg[4];
 
     // Convert base26 column string to number
     // All your Base are belong to us.
     $chars = preg_split('//', $col, -1, PREG_SPLIT_NO_EMPTY);
-    $expn = 0;
-    $col = 0;
+    $expn  = 0;
+    $col   = 0;
 
     while (sizeof($chars) > 0) {
         $char = array_pop($chars); // Least significant character first
@@ -194,9 +194,9 @@ function xl_date_list($year, $month = 1, $day = 1, $hour = 0, $minute = 0, $seco
 function xl_parse_time($time)
 {
     if (preg_match('/(\d{1,2}):(\d\d):?((?:\d\d)(?:\.\d+)?)?(?:\s+)?(am|pm)?/i', $time, $reg)) {
-        $hours = $reg[1];
-        $minutes = $reg[2];
-        $seconds = $reg[3] || 0;
+        $hours    = $reg[1];
+        $minutes  = $reg[2];
+        $seconds  = $reg[3] || 0;
         $meridian = strtolower($reg[4]) || '';
 
         // Normalise midnight and midday
@@ -224,10 +224,10 @@ function xl_parse_date($date)
 {
     $unixtime = strtotime($date);
 
-    $year = date('Y', $unixtime);
-    $month = date('m', $unixtime);
-    $day = date('d', $unixtime);
-    $hour = date('H', $unixtime);
+    $year   = date('Y', $unixtime);
+    $month  = date('m', $unixtime);
+    $day    = date('d', $unixtime);
+    $hour   = date('H', $unixtime);
     $minute = date('i', $unixtime);
     $second = date('s', $unixtime);
 

@@ -113,26 +113,26 @@ class writeexcel_workbook extends writeexcel_biffwriter
 
         $tmp_format = new writeexcel_format();
         $byte_order = $this->_byte_order;
-        $parser = new writeexcel_formula($byte_order);
+        $parser     = new writeexcel_formula($byte_order);
 
         $this->_filename = $filename;
-        $this->_parser = $parser;
+        $this->_parser   = $parser;
         //?	$this->_tempdir			= undef;
-        $this->_1904 = 0;
+        $this->_1904        = 0;
         $this->_activesheet = 0;
-        $this->_firstsheet = 0;
-        $this->_selected = 0;
-        $this->_xf_index = 16; # 15 style XF's and 1 cell XF.
-        $this->_fileclosed = 0;
-        $this->_biffsize = 0;
-        $this->_sheetname = 'Sheet';
-        $this->_tmp_format = $tmp_format;
-        $this->_url_format = false;
-        $this->_codepage = 0x04E4;
-        $this->_worksheets = array();
-        $this->_sheetnames = array();
-        $this->_formats = array();
-        $this->_palette = array();
+        $this->_firstsheet  = 0;
+        $this->_selected    = 0;
+        $this->_xf_index    = 16; # 15 style XF's and 1 cell XF.
+        $this->_fileclosed  = 0;
+        $this->_biffsize    = 0;
+        $this->_sheetname   = 'Sheet';
+        $this->_tmp_format  = $tmp_format;
+        $this->_url_format  = false;
+        $this->_codepage    = 0x04E4;
+        $this->_worksheets  = array();
+        $this->_sheetnames  = array();
+        $this->_formats     = array();
+        $this->_palette     = array();
 
         # Add the default format for hyperlinks
         $this->_url_format = $this->addformat(array('color' => 'blue', 'underline' => 1));
@@ -258,7 +258,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
             trigger_error("Sheetname $name must be <= 31 chars", E_USER_ERROR);
         }
 
-        $index = sizeof($this->_worksheets);
+        $index     = sizeof($this->_worksheets);
         $sheetname = $this->_sheetname;
 
         if ($name == '') {
@@ -591,10 +591,10 @@ class writeexcel_workbook extends writeexcel_biffwriter
     {
         ## ABR
         if ($this->_tmpfilename != '') {
-            $OLE = new writeexcel_olewriter('/tmp/'.$this->_tmpfilename);
+            $OLE                  = new writeexcel_olewriter('/tmp/'.$this->_tmpfilename);
             $OLE->_OLEtmpfilename = '/tmp/'.$this->_tmpfilename;
         } else {
-            $OLE = new writeexcel_olewriter($this->_filename);
+            $OLE                  = new writeexcel_olewriter($this->_filename);
             $OLE->_OLEtmpfilename = '';
         };
         ## END ABR
@@ -622,8 +622,8 @@ class writeexcel_workbook extends writeexcel_biffwriter
      */
     public function _calc_sheet_offsets()
     {
-        $BOF = 11;
-        $EOF = 4;
+        $BOF    = 11;
+        $EOF    = 4;
         $offset = $this->_datasize;
 
         foreach ($this->_worksheets as $sheet) {
@@ -633,7 +633,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $offset += $EOF;
 
         for ($c = 0; $c < sizeof($this->_worksheets); ++$c) {
-            $sheet = &$this->_worksheets[$c];
+            $sheet          = &$this->_worksheets[$c];
             $sheet->_offset = $offset;
             $offset += $sheet->_datasize;
         }
@@ -650,7 +650,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
     {
         # _tmp_format is added by new(). We use this to write the default XF's
         $format = $this->_tmp_format;
-        $font = $format->get_font();
+        $font   = $format->get_font();
 
         # Note: Fonts are 0-indexed. According to the SDK there is no index 4,
         # so the following fonts are 0, 1, 2, 3, 5
@@ -664,7 +664,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
         #
         $index = 6;                # The first user defined FONT
 
-        $key = $format->get_font_key(); # The default font from _tmp_format
+        $key         = $format->get_font_key(); # The default font from _tmp_format
         $fonts[$key] = 0;            # Index of the default font
 
         for ($c = 0; $c < sizeof($this->_formats); ++$c) {
@@ -677,7 +677,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
                 $format->_font_index = $fonts[$key];
             } else {
                 # Add a new FONT record
-                $fonts[$key] = $index;
+                $fonts[$key]         = $index;
                 $format->_font_index = $index;
                 ++$index;
                 $font = $format->get_font();
@@ -696,7 +696,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
 
         # Leaning num_format syndrome
         $num_formats_list = array();
-        $index = 164;
+        $index            = 164;
 
         # Iterate through the XF objects and write a FORMAT record if it isn't a
         # built-in format type and if the FORMAT string hasn't already been used.
@@ -724,7 +724,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
             } else {
                 # Add a new FORMAT
                 $num_formats[$num_format] = $index;
-                $format->_num_format = $index;
+                $format->_num_format      = $index;
                 array_push($num_formats_list, $num_format);
                 ++$index;
             }
@@ -857,20 +857,20 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $record = 0x003D;                # Record identifier
         $length = 0x0012;                # Number of bytes to follow
 
-        $xWn = 0x0000;                # Horizontal position of window
-        $yWn = 0x0000;                # Vertical position of window
+        $xWn  = 0x0000;                # Horizontal position of window
+        $yWn  = 0x0000;                # Vertical position of window
         $dxWn = 0x25BC;                # Width of window
         $dyWn = 0x1572;                # Height of window
 
-        $grbit = 0x0038;                # Option flags
-        $ctabsel = $this->_selected;    # Number of workbook tabs selected
+        $grbit     = 0x0038;                # Option flags
+        $ctabsel   = $this->_selected;    # Number of workbook tabs selected
         $wTabRatio = 0x0258;                # Tab to scrollbar ratio
 
         $itabFirst = $this->_firstsheet;    # 1st displayed worksheet
-        $itabCur = $this->_activesheet;  # Active worksheet
+        $itabCur   = $this->_activesheet;  # Active worksheet
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvvvvvvv', $xWn, $yWn, $dxWn, $dyWn, $grbit, $itabCur, $itabFirst, $ctabsel, $wTabRatio);
+        $data   = pack('vvvvvvvvv', $xWn, $yWn, $dxWn, $dyWn, $grbit, $itabCur, $itabFirst, $ctabsel, $wTabRatio);
 
         $this->_append($header.$data);
     }
@@ -887,10 +887,10 @@ class writeexcel_workbook extends writeexcel_biffwriter
         //$sheetname = $_[0];				# Worksheet name
         //$offset	= $_[1];				# Location of worksheet BOF
         $grbit = 0x0000;            # Sheet identifier
-        $cch = strlen($sheetname);    # Length of sheet name
+        $cch   = strlen($sheetname);    # Length of sheet name
 
         $header = pack('vv', $record, $length);
-        $data = pack('VvC', $offset, $grbit, $cch);
+        $data   = pack('VvC', $offset, $grbit, $cch);
 
         $this->_append($header.$data.$sheetname);
     }
@@ -905,12 +905,12 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $record = 0x0293; # Record identifier
         $length = 0x0004; # Bytes to follow
 
-        $ixfe = 0x8000; # Index to style XF
+        $ixfe    = 0x8000; # Index to style XF
         $BuiltIn = 0x00;    # Built-in style
-        $iLevel = 0xff;    # Outline style level
+        $iLevel  = 0xff;    # Outline style level
 
         $header = pack('vv', $record, $length);
-        $data = pack('vCC', $ixfe, $BuiltIn, $iLevel);
+        $data   = pack('vCC', $ixfe, $BuiltIn, $iLevel);
 
         $this->_append($header.$data);
     }
@@ -926,11 +926,11 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $length = 0x03 + strlen($num_format);    # Number of bytes to follow
 
         $format = $num_format;                # Custom format string
-        $ifmt = $index;                # Format index code
-        $cch = strlen($format);        # Length of format string
+        $ifmt   = $index;                # Format index code
+        $cch    = strlen($format);        # Length of format string
 
         $header = pack('vv', $record, $length);
-        $data = pack('vC', $ifmt, $cch);
+        $data   = pack('vC', $ifmt, $cch);
 
         $this->_append($header.$data.$format);
     }
@@ -948,7 +948,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $f1904 = $this->_1904; # Flag for 1904 date system
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $f1904);
+        $data   = pack('v', $f1904);
 
         $this->_append($header.$data);
     }
@@ -973,7 +973,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $cxals = $par0;        # Number of external references
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $cxals);
+        $data   = pack('v', $cxals);
 
         $this->_append($header.$data);
     }
@@ -993,11 +993,11 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $length = 0x02 + strlen($par0); # Number of bytes to follow
 
         $sheetname = $par0;                # Worksheet name
-        $cch = strlen($sheetname);    # Length of sheet name
-        $rgch = 0x03;                # Filename encoding
+        $cch       = strlen($sheetname);    # Length of sheet name
+        $rgch      = 0x03;                # Filename encoding
 
         $header = pack('vv', $record, $length);
-        $data = pack('CC', $cch, $rgch);
+        $data   = pack('CC', $cch, $rgch);
 
         $this->_append($header.$data.$sheetname);
     }
@@ -1015,19 +1015,19 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $length = 0x0024;    # Number of bytes to follow
 
         $index = $par0;        # Sheet index
-        $type = $par1;
+        $type  = $par1;
 
-        $grbit = 0x0020;    # Option flags
-        $chKey = 0x00;        # Keyboard shortcut
-        $cch = 0x01;        # Length of text name
-        $cce = 0x0015;    # Length of text definition
-        $ixals = $index + 1;    # Sheet index
-        $itab = $ixals;    # Equal to ixals
-        $cchCustMenu = 0x00;        # Length of cust menu text
+        $grbit          = 0x0020;    # Option flags
+        $chKey          = 0x00;        # Keyboard shortcut
+        $cch            = 0x01;        # Length of text name
+        $cce            = 0x0015;    # Length of text definition
+        $ixals          = $index + 1;    # Sheet index
+        $itab           = $ixals;    # Equal to ixals
+        $cchCustMenu    = 0x00;        # Length of cust menu text
         $cchDescription = 0x00;        # Length of description text
-        $cchHelptopic = 0x00;        # Length of help topic text
-        $cchStatustext = 0x00;        # Length of status bar text
-        $rgch = $type;        # Built-in name type
+        $cchHelptopic   = 0x00;        # Length of help topic text
+        $cchStatustext  = 0x00;        # Length of status bar text
+        $rgch           = $type;        # Built-in name type
 
         $unknown03 = 0x3b;
         $unknown04 = 0xffff - $index;
@@ -1042,7 +1042,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $colmax = $par5;        # end column
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $grbit);
+        $data   = pack('v', $grbit);
         $data .= pack('C', $chKey);
         $data .= pack('C', $cch);
         $data .= pack('v', $cce);
@@ -1083,19 +1083,19 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $length = 0x003d;    # Number of bytes to follow
 
         $index = $par0;        # Sheet index
-        $type = $par1;
+        $type  = $par1;
 
-        $grbit = 0x0020;    # Option flags
-        $chKey = 0x00;        # Keyboard shortcut
-        $cch = 0x01;        # Length of text name
-        $cce = 0x002e;    # Length of text definition
-        $ixals = $index + 1;    # Sheet index
-        $itab = $ixals;    # Equal to ixals
-        $cchCustMenu = 0x00;        # Length of cust menu text
+        $grbit          = 0x0020;    # Option flags
+        $chKey          = 0x00;        # Keyboard shortcut
+        $cch            = 0x01;        # Length of text name
+        $cce            = 0x002e;    # Length of text definition
+        $ixals          = $index + 1;    # Sheet index
+        $itab           = $ixals;    # Equal to ixals
+        $cchCustMenu    = 0x00;        # Length of cust menu text
         $cchDescription = 0x00;        # Length of description text
-        $cchHelptopic = 0x00;        # Length of help topic text
-        $cchStatustext = 0x00;        # Length of status bar text
-        $rgch = $type;    # Built-in name type
+        $cchHelptopic   = 0x00;        # Length of help topic text
+        $cchStatustext  = 0x00;        # Length of status bar text
+        $rgch           = $type;    # Built-in name type
 
         $unknown01 = 0x29;
         $unknown02 = 0x002b;
@@ -1112,7 +1112,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
         $colmax = $par5;        # end column
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $grbit);
+        $data   = pack('v', $grbit);
         $data .= pack('C', $chKey);
         $data .= pack('C', $cch);
         $data .= pack('v', $cce);
@@ -1168,7 +1168,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
 
         $record = 0x0092;                    # Record identifier
         $length = 2 + 4 * sizeof($aref);    # Number of bytes to follow
-        $ccv = sizeof($aref);            # Number of RGB values to follow
+        $ccv    = sizeof($aref);            # Number of RGB values to follow
         //$data;								# The RGB data
         # Pack the RGB data
         $data = '';
@@ -1190,10 +1190,10 @@ class writeexcel_workbook extends writeexcel_biffwriter
     {
         $record = 0x0042;            # Record identifier
         $length = 0x0002;            # Number of bytes to follow
-        $cv = $this->_codepage;    # The code page
+        $cv     = $this->_codepage;    # The code page
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $cv);
+        $data   = pack('v', $cv);
 
         $this->_append($header.$data);
     }

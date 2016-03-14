@@ -68,30 +68,30 @@ class writeexcel_format
 
         $this->_xf_index = (sizeof($_) > 0) ? array_shift($_) : 0;
 
-        $this->_font_index = 0;
-        $this->_font = 'Arial';
-        $this->_size = 10;
-        $this->_bold = 0x0190;
-        $this->_italic = 0;
-        $this->_color = 0x7FFF;
-        $this->_underline = 0;
+        $this->_font_index     = 0;
+        $this->_font           = 'Arial';
+        $this->_size           = 10;
+        $this->_bold           = 0x0190;
+        $this->_italic         = 0;
+        $this->_color          = 0x7FFF;
+        $this->_underline      = 0;
         $this->_font_strikeout = 0;
-        $this->_font_outline = 0;
-        $this->_font_shadow = 0;
-        $this->_font_script = 0;
-        $this->_font_family = 0;
-        $this->_font_charset = 0;
+        $this->_font_outline   = 0;
+        $this->_font_shadow    = 0;
+        $this->_font_script    = 0;
+        $this->_font_family    = 0;
+        $this->_font_charset   = 0;
 
         $this->_num_format = 0;
 
         $this->_hidden = 0;
         $this->_locked = 1;
 
-        $this->_text_h_align = 0;
-        $this->_text_wrap = 0;
-        $this->_text_v_align = 2;
+        $this->_text_h_align  = 0;
+        $this->_text_wrap     = 0;
+        $this->_text_v_align  = 2;
         $this->_text_justlast = 0;
-        $this->_rotation = 0;
+        $this->_rotation      = 0;
 
         $this->_fg_color = 0x40;
         $this->_bg_color = 0x41;
@@ -99,14 +99,14 @@ class writeexcel_format
         $this->_pattern = 0;
 
         $this->_bottom = 0;
-        $this->_top = 0;
-        $this->_left = 0;
-        $this->_right = 0;
+        $this->_top    = 0;
+        $this->_left   = 0;
+        $this->_right  = 0;
 
         $this->_bottom_color = 0x40;
-        $this->_top_color = 0x40;
-        $this->_left_color = 0x40;
-        $this->_right_color = 0x40;
+        $this->_top_color    = 0x40;
+        $this->_left_color   = 0x40;
+        $this->_right_color  = 0x40;
 
         // Set properties passed to writeexcel_workbook::addformat()
         if (sizeof($_) > 0) {
@@ -210,14 +210,14 @@ class writeexcel_format
                 $this->_fg_color == 0x40) {
             $this->_fg_color = $this->_bg_color;
             $this->_bg_color = 0x40;
-            $this->_pattern = 1;
+            $this->_pattern  = 1;
         }
 
         if ($this->_pattern <= 0x01 &&
                 $this->_bg_color == 0x41 &&
                 $this->_fg_color != 0x40) {
             $this->_bg_color = 0x40;
-            $this->_pattern = 1;
+            $this->_pattern  = 1;
         }
 
         $record = 0x00E0;
@@ -254,7 +254,7 @@ class writeexcel_format
         $border2 |= $this->_right_color << 7;
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvvvvvv', $ifnt, $ifmt, $style, $align, $icv, $fill, $border1, $border2);
+        $data   = pack('vvvvvvvv', $ifnt, $ifmt, $style, $align, $icv, $fill, $border1, $border2);
 
         return $header.$data;
     }
@@ -280,17 +280,17 @@ class writeexcel_format
         // $rgch	   Font name
 
         $dyHeight = $this->_size * 20;
-        $icv = $this->_color;
-        $bls = $this->_bold;
-        $sss = $this->_font_script;
-        $uls = $this->_underline;
-        $bFamily = $this->_font_family;
+        $icv      = $this->_color;
+        $bls      = $this->_bold;
+        $sss      = $this->_font_script;
+        $uls      = $this->_underline;
+        $bFamily  = $this->_font_family;
         $bCharSet = $this->_font_charset;
-        $rgch = $this->_font;
+        $rgch     = $this->_font;
 
-        $cch = strlen($rgch);
-        $record = 0x31;
-        $length = 0x0F + $cch;
+        $cch      = strlen($rgch);
+        $record   = 0x31;
+        $length   = 0x0F + $cch;
         $reserved = 0x00;
 
         $grbit = 0x00;
@@ -312,7 +312,7 @@ class writeexcel_format
         }
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvvvCCCCC', $dyHeight, $grbit, $icv, $bls, $sss, $uls, $bFamily, $bCharSet, $reserved, $cch);
+        $data   = pack('vvvvvCCCCC', $dyHeight, $grbit, $icv, $bls, $sss, $uls, $bFamily, $bCharSet, $reserved, $cch);
 
         return $header.$data.$this->_font;
     }
@@ -355,24 +355,24 @@ class writeexcel_format
     public function _get_color($color = false)
     {
         $colors = array(
-            'aqua' => 0x0F,
-            'cyan' => 0x0F,
-            'black' => 0x08,
-            'blue' => 0x0C,
-            'brown' => 0x10,
+            'aqua'    => 0x0F,
+            'cyan'    => 0x0F,
+            'black'   => 0x08,
+            'blue'    => 0x0C,
+            'brown'   => 0x10,
             'magenta' => 0x0E,
             'fuchsia' => 0x0E,
-            'gray' => 0x17,
-            'grey' => 0x17,
-            'green' => 0x11,
-            'lime' => 0x0B,
-            'navy' => 0x12,
-            'orange' => 0x35,
-            'purple' => 0x14,
-            'red' => 0x0A,
-            'silver' => 0x16,
-            'white' => 0x09,
-            'yellow' => 0x0D,
+            'gray'    => 0x17,
+            'grey'    => 0x17,
+            'green'   => 0x11,
+            'lime'    => 0x0B,
+            'navy'    => 0x12,
+            'orange'  => 0x35,
+            'purple'  => 0x14,
+            'red'     => 0x0A,
+            'silver'  => 0x16,
+            'white'   => 0x09,
+            'yellow'  => 0x0D,
         );
 
         // Return the default color, 0x7FFF, if undef,

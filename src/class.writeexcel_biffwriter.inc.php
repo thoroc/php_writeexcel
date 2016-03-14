@@ -38,12 +38,12 @@ class writeexcel_biffwriter
      */
     public function writeexcel_biffwriter()
     {
-        $this->byte_order = '';
+        $this->byte_order   = '';
         $this->BIFF_version = 0x0500;
-        $this->_byte_order = '';
-        $this->_data = false;
-        $this->_datasize = 0;
-        $this->_limit = 2080;
+        $this->_byte_order  = '';
+        $this->_data        = false;
+        $this->_datasize    = 0;
+        $this->_limit       = 2080;
 
         $this->_set_byte_order();
     }
@@ -57,7 +57,7 @@ class writeexcel_biffwriter
         $this->byteorder = 0;
         // Check if "pack" gives the required IEEE 64bit float
         $teststr = pack('d', 1.2345);
-        $number = pack('C8', 0x8D, 0x97, 0x6E, 0x12, 0x83, 0xC0, 0xF3, 0x3F);
+        $number  = pack('C8', 0x8D, 0x97, 0x6E, 0x12, 0x83, 0xC0, 0xF3, 0x3F);
 
         if ($number == $teststr) {
             $this->byte_order = 0; // Little Endian
@@ -149,10 +149,10 @@ class writeexcel_biffwriter
         // However, this throws a warning in Excel 5. So, use these
         // magic numbers.
         $build = 0x096C;
-        $year = 0x07C9;
+        $year  = 0x07C9;
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvv', $version, $type, $build, $year);
+        $data   = pack('vvvv', $version, $type, $build, $year);
 
         $this->_prepend($header.$data);
     }
@@ -180,13 +180,13 @@ class writeexcel_biffwriter
      */
     public function _add_continue($data)
     {
-        $limit = $this->_limit;
+        $limit  = $this->_limit;
         $record = 0x003C; // Record identifier
         // The first 2080/8224 bytes remain intact. However, we have to change
         // the length field of the record.
-        $tmp = substr($data, 0, $limit);
+        $tmp  = substr($data, 0, $limit);
         $data = substr($data, $limit);
-        $tmp = substr($tmp, 0, 2).pack('v', $limit - 4).substr($tmp, 4);
+        $tmp  = substr($tmp, 0, 2).pack('v', $limit - 4).substr($tmp, 4);
 
         // Strip out chunks of 2080/8224 bytes +4 for the header.
         while (strlen($data) > $limit) {

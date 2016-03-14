@@ -43,18 +43,18 @@ class writeexcel_olewriter
      */
     public function writeexcel_olewriter($filename)
     {
-        $this->_OLEfilename = $filename;
-        $this->_filehandle = false;
-        $this->_fileclosed = 0;
-        $this->_internal_fh = 0;
-        $this->_biff_only = 0;
+        $this->_OLEfilename  = $filename;
+        $this->_filehandle   = false;
+        $this->_fileclosed   = 0;
+        $this->_internal_fh  = 0;
+        $this->_biff_only    = 0;
         $this->_size_allowed = 0;
-        $this->_biffsize = 0;
-        $this->_booksize = 0;
-        $this->_big_blocks = 0;
-        $this->_list_blocks = 0;
-        $this->_root_start = 0;
-        $this->_block_count = 4;
+        $this->_biffsize     = 0;
+        $this->_booksize     = 0;
+        $this->_big_blocks   = 0;
+        $this->_list_blocks  = 0;
+        $this->_root_start   = 0;
+        $this->_block_count  = 4;
 
         $this->_initialize();
     }
@@ -140,7 +140,7 @@ class writeexcel_olewriter
         // There are 127 list blocks and 1 marker blocks for each big block
         // depot + 1 end of chain block
         $this->_list_blocks = floor(($this->_big_blocks) / 127) + 1;
-        $this->_root_start = $this->_big_blocks;
+        $this->_root_start  = $this->_big_blocks;
 
         //print $this->_biffsize.	"\n";
         //print $this->_big_blocks.  "\n";
@@ -202,21 +202,21 @@ class writeexcel_olewriter
         $this->_calculate_sizes();
 
         $root_start = $this->_root_start;
-        $num_lists = $this->_list_blocks;
+        $num_lists  = $this->_list_blocks;
 
         $id = pack('C8', 0xD0, 0xCF, 0x11, 0xE0,
                                       0xA1, 0xB1, 0x1A, 0xE1);
-        $unknown1 = pack('VVVV', 0x00, 0x00, 0x00, 0x00);
-        $unknown2 = pack('vv',   0x3E, 0x03);
-        $unknown3 = pack('v',    -2);
-        $unknown4 = pack('v',    0x09);
-        $unknown5 = pack('VVV',  0x06, 0x00, 0x00);
-        $num_bbd_blocks = pack('V',    $num_lists);
+        $unknown1        = pack('VVVV', 0x00, 0x00, 0x00, 0x00);
+        $unknown2        = pack('vv',   0x3E, 0x03);
+        $unknown3        = pack('v',    -2);
+        $unknown4        = pack('v',    0x09);
+        $unknown5        = pack('VVV',  0x06, 0x00, 0x00);
+        $num_bbd_blocks  = pack('V',    $num_lists);
         $root_startblock = pack('V',    $root_start);
-        $unknown6 = pack('VV',   0x00, 0x1000);
-        $sbd_startblock = pack('V',    -2);
-        $unknown7 = pack('VVV',  0x00, -2, 0x00);
-        $unused = pack('V',    -1);
+        $unknown6        = pack('VV',   0x00, 0x1000);
+        $sbd_startblock  = pack('V',    -2);
+        $unknown7        = pack('VVV',  0x00, -2, 0x00);
+        $unused          = pack('V',    -1);
 
         fputs($this->_filehandle, $id);
         fputs($this->_filehandle, $unknown1);
@@ -245,14 +245,14 @@ class writeexcel_olewriter
      */
     public function _write_big_block_depot()
     {
-        $num_blocks = $this->_big_blocks;
-        $num_lists = $this->_list_blocks;
+        $num_blocks   = $this->_big_blocks;
+        $num_lists    = $this->_list_blocks;
         $total_blocks = $num_lists * 128;
-        $used_blocks = $num_blocks + $num_lists + 2;
+        $used_blocks  = $num_blocks + $num_lists + 2;
 
-        $marker = pack('V', -3);
+        $marker       = pack('V', -3);
         $end_of_chain = pack('V', -2);
-        $unused = pack('V', -1);
+        $unused       = pack('V', -1);
 
         for ($i = 1;$i <= ($num_blocks - 1);++$i) {
             fputs($this->_filehandle, pack('V', $i));
@@ -290,7 +290,7 @@ class writeexcel_olewriter
      */
     public function _write_pps($name, $type, $dir, $start, $size)
     {
-        $names = array();
+        $names  = array();
         $length = 0;
 
         if ($name != '') {
@@ -304,13 +304,13 @@ class writeexcel_olewriter
         }
 
         $rawname = call_user_func_array('pack', array_merge(array('v*'), $names));
-        $zero = pack('C',  0);
+        $zero    = pack('C',  0);
 
         $pps_sizeofname = pack('v',  $length);   //0x40
-        $pps_type = pack('v',  $type);     //0x42
-        $pps_prev = pack('V',  -1);        //0x44
-        $pps_next = pack('V',  -1);        //0x48
-        $pps_dir = pack('V',  $dir);      //0x4c
+        $pps_type       = pack('v',  $type);     //0x42
+        $pps_prev       = pack('V',  -1);        //0x44
+        $pps_next       = pack('V',  -1);        //0x48
+        $pps_dir        = pack('V',  $dir);      //0x4c
 
         $unknown1 = pack('V',  0);
 
@@ -318,7 +318,7 @@ class writeexcel_olewriter
         $pps_ts1d = pack('V',  0);         //0x68
         $pps_ts2s = pack('V',  0);         //0x6c
         $pps_ts2d = pack('V',  0);         //0x70
-        $pps_sb = pack('V',  $start);    //0x74
+        $pps_sb   = pack('V',  $start);    //0x74
         $pps_size = pack('V',  $size);     //0x78
 
         fputs($this->_filehandle, $rawname);

@@ -104,45 +104,45 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         // source : http://blog.adin.pro/2013-03-13/writeexcel-php-max-size-255/
         $strmax = 32767;
 
-        $this->_name = $name;
-        $this->_index = $index;
+        $this->_name        = $name;
+        $this->_index       = $index;
         $this->_activesheet = &$activesheet;
-        $this->_firstsheet = &$firstsheet;
-        $this->_url_format = &$url_format;
-        $this->_parser = &$parser;
-        $this->_tempdir = $tempdir;
+        $this->_firstsheet  = &$firstsheet;
+        $this->_url_format  = &$url_format;
+        $this->_parser      = &$parser;
+        $this->_tempdir     = $tempdir;
 
-        $this->_ext_sheets = array();
+        $this->_ext_sheets    = array();
         $this->_using_tmpfile = 1;
-        $this->_tmpfilename = false;
-        $this->_filehandle = false;
-        $this->_fileclosed = 0;
-        $this->_offset = 0;
-        $this->_xls_rowmax = $rowmax;
-        $this->_xls_colmax = $colmax;
-        $this->_xls_strmax = $strmax;
-        $this->_dim_rowmin = $rowmax + 1;
-        $this->_dim_rowmax = 0;
-        $this->_dim_colmin = $colmax + 1;
-        $this->_dim_colmax = 0;
-        $this->_colinfo = array();
-        $this->_selection = array(0, 0);
-        $this->_panes = array();
-        $this->_active_pane = 3;
-        $this->_frozen = 0;
-        $this->_selected = 0;
+        $this->_tmpfilename   = false;
+        $this->_filehandle    = false;
+        $this->_fileclosed    = 0;
+        $this->_offset        = 0;
+        $this->_xls_rowmax    = $rowmax;
+        $this->_xls_colmax    = $colmax;
+        $this->_xls_strmax    = $strmax;
+        $this->_dim_rowmin    = $rowmax + 1;
+        $this->_dim_rowmax    = 0;
+        $this->_dim_colmin    = $colmax + 1;
+        $this->_dim_colmax    = 0;
+        $this->_colinfo       = array();
+        $this->_selection     = array(0, 0);
+        $this->_panes         = array();
+        $this->_active_pane   = 3;
+        $this->_frozen        = 0;
+        $this->_selected      = 0;
 
-        $this->_paper_size = 0x0;
-        $this->_orientation = 0x1;
-        $this->_header = '';
-        $this->_footer = '';
-        $this->_hcenter = 0;
-        $this->_vcenter = 0;
-        $this->_margin_head = 0.50;
-        $this->_margin_foot = 0.50;
-        $this->_margin_left = 0.75;
-        $this->_margin_right = 0.75;
-        $this->_margin_top = 1.00;
+        $this->_paper_size    = 0x0;
+        $this->_orientation   = 0x1;
+        $this->_header        = '';
+        $this->_footer        = '';
+        $this->_hcenter       = 0;
+        $this->_vcenter       = 0;
+        $this->_margin_head   = 0.50;
+        $this->_margin_foot   = 0.50;
+        $this->_margin_left   = 0.75;
+        $this->_margin_right  = 0.75;
+        $this->_margin_top    = 1.00;
         $this->_margin_bottom = 1.00;
 
         $this->_title_rowmin = false;
@@ -154,18 +154,18 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $this->_print_colmin = false;
         $this->_print_colmax = false;
 
-        $this->_print_gridlines = 1;
+        $this->_print_gridlines  = 1;
         $this->_screen_gridlines = 1;
-        $this->_print_headers = 0;
+        $this->_print_headers    = 0;
 
-        $this->_fit_page = 0;
-        $this->_fit_width = 0;
+        $this->_fit_page   = 0;
+        $this->_fit_width  = 0;
         $this->_fit_height = 0;
 
         $this->_hbreaks = array();
         $this->_vbreaks = array();
 
-        $this->_protect = 0;
+        $this->_protect  = 0;
         $this->_password = false;
 
         $this->_col_sizes = array();
@@ -174,7 +174,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $this->_col_formats = array();
         $this->_row_formats = array();
 
-        $this->_zoom = 100;
+        $this->_zoom        = 100;
         $this->_print_scale = 100;
 
         $this->_initialize();
@@ -217,7 +217,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         # Open tmp file for storing Worksheet data.
         $this->_tmpfilename = tempnam($this->_tempdir, 'php_writeexcel');
-        $fh = fopen($this->_tmpfilename, 'w+b');
+        $fh                 = fopen($this->_tmpfilename, 'w+b');
 
         if ($fh) {
             # Store filehandle
@@ -225,7 +225,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         } else {
             # If tempfile() failed store data in memory
             $this->_using_tmpfile = 0;
-            $this->_tmpfilename = false;
+            $this->_tmpfilename   = false;
 
             if ($this->_index == 0) {
                 $dir = $this->_tempdir;
@@ -322,7 +322,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         # Return data stored in memory
         if ($this->_data !== false) {
-            $tmp = $this->_data;
+            $tmp         = $this->_data;
             $this->_data = false;
 
             // The next data comes from the temporary file, so prepare
@@ -375,7 +375,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         if ($this->_using_tmpfile) {
             fclose($this->_filehandle);
             unlink($this->_tmpfilename);
-            $this->_tmpfilename = false;
+            $this->_tmpfilename   = false;
             $this->_using_tmpfile = false;
         }
     }
@@ -396,7 +396,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
      */
     public function activate()
     {
-        $this->_selected = 1;
+        $this->_selected    = 1;
         $this->_activesheet = $this->_index;
     }
 
@@ -417,7 +417,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
      */
     public function protect($password)
     {
-        $this->_protect = 1;
+        $this->_protect  = 1;
         $this->_password = $this->_encode_password($password);
     }
 
@@ -448,7 +448,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             return;
         }
 
-        $width = @$_[4] ? 0 : $_[2]; # Set width to zero if column is hidden
+        $width  = @$_[4] ? 0 : $_[2]; # Set width to zero if column is hidden
         $format = @$_[3];
 
         list($firstcol, $lastcol) = $_;
@@ -494,7 +494,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         $this->_frozen = 1;
-        $this->_panes = $_;
+        $this->_panes  = $_;
     }
 
     /**
@@ -507,7 +507,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $_ = func_get_args();
 
         $this->_frozen = 0;
-        $this->_panes = $_;
+        $this->_panes  = $_;
     }
 
     /**
@@ -545,7 +545,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             return;
         }
 
-        $this->_header = $string;
+        $this->_header      = $string;
         $this->_margin_head = $margin;
     }
 
@@ -560,7 +560,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             return;
         }
 
-        $this->_footer = $string;
+        $this->_footer      = $string;
         $this->_margin_foot = $margin;
     }
 
@@ -712,13 +712,13 @@ class writeexcel_worksheet extends writeexcel_biffwriter
     public function hide_gridlines($option = 1)
     {
         if ($option == 0) {
-            $this->_print_gridlines = 1; # 1 = display, 0 = hide
+            $this->_print_gridlines  = 1; # 1 = display, 0 = hide
             $this->_screen_gridlines = 1;
         } elseif ($option == 1) {
-            $this->_print_gridlines = 0;
+            $this->_print_gridlines  = 0;
             $this->_screen_gridlines = 1;
         } else {
-            $this->_print_gridlines = 0;
+            $this->_print_gridlines  = 0;
             $this->_screen_gridlines = 0;
         }
     }
@@ -739,8 +739,8 @@ class writeexcel_worksheet extends writeexcel_biffwriter
      */
     public function fit_to_pages($width, $height)
     {
-        $this->_fit_page = 1;
-        $this->_fit_width = $width;
+        $this->_fit_page   = 1;
+        $this->_fit_width  = $width;
         $this->_fit_height = $height;
     }
 
@@ -872,8 +872,8 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         list($row, $col, $tokens) = array_splice($_, 0, 3);
-        $options = $_[0];
-        $error = 0;
+        $options                  = $_[0];
+        $error                    = 0;
 
         foreach ($tokens as $token) {
 
@@ -936,9 +936,9 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             trigger_error('Not an array ref in call to write_row()!', E_USER_ERROR);
         }
 
-        $row = array_shift($_);
-        $col = array_shift($_);
-        $tokens = array_shift($_);
+        $row     = array_shift($_);
+        $col     = array_shift($_);
+        $tokens  = array_shift($_);
         $options = $_;
 
         $error = 0;
@@ -1055,8 +1055,8 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         # Convert base26 column string to number
         # All your Base are belong to us.
         $chars = preg_split('//', $col, -1, PREG_SPLIT_NO_EMPTY);
-        $expn = 0;
-        $col = 0;
+        $expn  = 0;
+        $col   = 0;
 
         while (sizeof($chars)) {
             $char = array_pop($chars); # LS char first
@@ -1111,15 +1111,15 @@ class writeexcel_worksheet extends writeexcel_biffwriter
     {
         $chars = preg_split('//', $plaintext, -1, PREG_SPLIT_NO_EMPTY);
         $count = sizeof($chars);
-        $i = 0;
+        $i     = 0;
 
         for ($c = 0; $c < sizeof($chars); ++$c) {
-            $char = &$chars[$c];
-            $char = ord($char) << ++$i;
-            $low_15 = $char & 0x7fff;
+            $char    = &$chars[$c];
+            $char    = ord($char) << ++$i;
+            $low_15  = $char & 0x7fff;
             $high_15 = $char & 0x7fff << 15;
             $high_15 = $high_15 >> 15;
-            $char = $low_15 | $high_15;
+            $char    = $low_15 | $high_15;
         }
 
         $password = 0x0000;
@@ -1189,8 +1189,8 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             $this->_dim_colmax = $col;
         }
 
-        $header = pack('vv', $record, $length);
-        $data = pack('vvv', $row, $col, $xf);
+        $header    = pack('vv', $record, $length);
+        $data      = pack('vvv', $row, $col, $xf);
         $xl_double = pack('d', $num);
 
         if ($this->_byte_order) {
@@ -1231,11 +1231,11 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $record = 0x0204;                        # Record identifier
         $length = 0x0008 + strlen($_[2]);        # Bytes to follow
 
-        $row = $_[0];                        # Zero indexed row
-        $col = $_[1];                        # Zero indexed column
+        $row    = $_[0];                        # Zero indexed row
+        $col    = $_[1];                        # Zero indexed column
         $strlen = strlen($_[2]);
-        $str = $_[2];
-        $xf = $this->_XF($row, $col, @$_[3]); # The cell format
+        $str    = $_[2];
+        $xf     = $this->_XF($row, $col, @$_[3]); # The cell format
 
         $str_error = 0;
 
@@ -1260,14 +1260,14 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         if ($strlen > $this->_xls_strmax) { # LABEL must be < 255 chars
-            $str = substr($str, 0, $this->_xls_strmax);
-            $length = 0x0008 + $this->_xls_strmax;
-            $strlen = $this->_xls_strmax;
+            $str       = substr($str, 0, $this->_xls_strmax);
+            $length    = 0x0008 + $this->_xls_strmax;
+            $strlen    = $this->_xls_strmax;
             $str_error = -3;
         }
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvv', $row, $col, $xf, $strlen);
+        $data   = pack('vvvv', $row, $col, $xf, $strlen);
 
         $this->_append($header.$data.$str);
 
@@ -1313,7 +1313,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         $row = $_[0];                        # Zero indexed row
         $col = $_[1];                        # Zero indexed column
-        $xf = $this->_XF($row, $col, $_[2]); # The cell format
+        $xf  = $this->_XF($row, $col, $_[2]); # The cell format
         # Check that row and col are valid and store max and min values
         if ($row >= $this->_xls_rowmax) {
             return -2;
@@ -1335,7 +1335,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvv', $row, $col, $xf);
+        $data   = pack('vvv', $row, $col, $xf);
 
         $this->_append($header.$data);
 
@@ -1372,18 +1372,18 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $record = 0x0006;    # Record identifier
         $length = 0;                # Bytes to follow
 
-        $row = $_[0];    # Zero indexed row
-        $col = $_[1];    # Zero indexed column
+        $row     = $_[0];    # Zero indexed row
+        $col     = $_[1];    # Zero indexed column
         $formula = $_[2];    # The formula text string
         # Excel normally stores the last calculated value of the formula in $num.
         # Clearly we are not in a position to calculate this a priori. Instead
         # we set $num to zero and set the option flags in $grbit to ensure
         # automatic calculation of the formula when the file is opened.
         #
-          $xf = $this->_XF($row, $col, @$_[3]); # The cell format
-        $num = 0x00;                        # Current value of formula
+          $xf  = $this->_XF($row, $col, @$_[3]); # The cell format
+        $num   = 0x00;                        # Current value of formula
         $grbit = 0x03;                        # Option flags
-        $chn = 0x0000;                        # Must be zero
+        $chn   = 0x0000;                        # Must be zero
         # Check that row and col are valid and store max and min values
         if ($row >= $this->_xls_rowmax) {
             return -2;
@@ -1408,14 +1408,14 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $formula = preg_replace('/^=/', '', $formula);
 
         # Parse the formula using the parser in Formula.pm
-        $parser = &$this->_parser;
+        $parser  = &$this->_parser;
         $formula = $parser->parse_formula($formula);
 
         $formlen = strlen($formula); # Length of the binary string
-        $length = 0x16 + $formlen;  # Length of the record data
+        $length  = 0x16 + $formlen;  # Length of the record data
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvdvVv', $row, $col, $xf, $num, $grbit, $chn, $formlen);
+        $data   = pack('vvvdvVv', $row, $col, $xf, $num, $grbit, $chn, $formlen);
 
         $this->_append($header.$data.$formula);
 
@@ -1518,7 +1518,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $col1 = $_[1];                        # Start column
         $row2 = $_[2];                        # End row
         $col2 = $_[3];                        # End column
-        $url = $_[4];                        # URL string
+        $url  = $_[4];                        # URL string
         if (isset($_[5])) {
             $str = $_[5];                        # Alternative label
         }
@@ -1553,7 +1553,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         # Pack the header data
         $header = pack('vv', $record, $length);
-        $data = pack('vvvv', $row1, $row2, $col1, $col2);
+        $data   = pack('vvvv', $row1, $row2, $col1, $col2);
 
         # Write the packed data
         $this->_append($header.
@@ -1585,7 +1585,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $col1 = $_[1];                        # Start column
         $row2 = $_[2];                        # End row
         $col2 = $_[3];                        # End column
-        $url = $_[4];                        # URL string
+        $url  = $_[4];                        # URL string
         if (isset($_[5])) {
             $str = $_[5];                        # Alternative label
         }
@@ -1621,7 +1621,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         # Pack the header data
         $header = pack('vv', $record, $length);
-        $data = pack('vvvv', $row1, $row2, $col1, $col2);
+        $data   = pack('vvvv', $row1, $row2, $col1, $col2);
 
         # Write the packed data
         $this->_append($header.
@@ -1662,7 +1662,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $col1 = $_[1];                        # Start column
         $row2 = $_[2];                        # End row
         $col2 = $_[3];                        # End column
-        $url = $_[4];                        # URL string
+        $url  = $_[4];                        # URL string
         if (isset($_[5])) {
             $str = $_[5];                        # Alternative label
         }
@@ -1670,7 +1670,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         # Strip URL type and change Unix dir separator to Dos style (if needed)
         #
           $url = preg_replace('[^external:]', '', $url);
-        $url = preg_replace('[/]', '\\', $url);
+        $url   = preg_replace('[/]', '\\', $url);
 
         # Write the visible label
         if (!isset($str)) {
@@ -1701,17 +1701,17 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         # Split the dir name and sheet name (if it exists)
         #
           list($dir_long, $sheet) = preg_split('/\#/', $url);
-        $link_type = 0x01 | $absolute;
+        $link_type                = 0x01 | $absolute;
 
         //!!!
         if (isset($sheet)) {
             $link_type |= 0x08;
             $sheet_len = pack('V', length($sheet) + 0x01);
-            $sheet = implode("\0", split('', $sheet));
+            $sheet     = implode("\0", split('', $sheet));
             $sheet .= "\0\0\0";
         } else {
             $sheet_len = '';
-            $sheet = '';
+            $sheet     = '';
         }
 
         # Pack the link type
@@ -1732,8 +1732,8 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         # Pack the lengths of the dir strings
         $dir_short_len = pack('V', strlen($dir_short));
-        $dir_long_len = pack('V', strlen($dir_long));
-        $stream_len = pack('V', strlen($dir_long) + 0x06);
+        $dir_long_len  = pack('V', strlen($dir_long));
+        $stream_len    = pack('V', strlen($dir_long) + 0x06);
 
         # Pack the undocumented parts of the hyperlink stream
         $unknown1 = pack('H*', 'D0C9EA79F9BACE118C8200AA004BA90B02000000');
@@ -1786,14 +1786,14 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $col1 = $_[1];                        # Start column
         $row2 = $_[2];                        # End row
         $col2 = $_[3];                        # End column
-        $url = $_[4];                        # URL string
+        $url  = $_[4];                        # URL string
         if (isset($_[5])) {
             $str = $_[5];                        # Alternative label
         }
         $xf = $_[6] ? $_[6] : $this->_url_format;  # The cell format
         # Strip URL type and change Unix dir separator to Dos style (if needed)
         #
-      $url = preg_replace('[^external:]', '', $url);
+      $url   = preg_replace('[^external:]', '', $url);
         $url = preg_replace('[/]', '\\');
 
         # Write the visible label
@@ -1811,16 +1811,16 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         # Split the dir name and sheet name (if it exists)
         #
         list($dir_long, $sheet) = preg_split('\#', $url);
-        $link_type = 0x0103; # Always absolute
+        $link_type              = 0x0103; # Always absolute
         //!!!
         if (isset($sheet)) {
             $link_type |= 0x08;
             $sheet_len = pack('V', strlen($sheet) + 0x01);
-            $sheet = implode("\0", preg_split("''", $sheet, -1, PREG_SPLIT_NO_EMPTY));
+            $sheet     = implode("\0", preg_split("''", $sheet, -1, PREG_SPLIT_NO_EMPTY));
             $sheet .= "\0\0\0";
         } else {
             $sheet_len = '';
-            $sheet = '';
+            $sheet     = '';
         }
 
         # Pack the link type
@@ -1871,13 +1871,13 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $record = 0x0208;            # Record identifier
         $length = 0x0010;            # Number of bytes to follow
 
-        $rw = $_[0];                # Row Number
+        $rw     = $_[0];                # Row Number
         $colMic = 0x0000;            # First defined column
         $colMac = 0x0000;            # Last defined column
         //$miyRw;							# Row height
-        $irwMac = 0x0000;            # Used by Excel to optimise loading
+        $irwMac   = 0x0000;            # Used by Excel to optimise loading
         $reserved = 0x0000;            # Reserved
-        $grbit = 0x01C0;            # Option flags. (monkey) see $1 do
+        $grbit    = 0x01C0;            # Option flags. (monkey) see $1 do
         //$ixfe;							# XF index
         if (isset($_[2])) {
             $format = $_[2];                # Format object
@@ -1898,7 +1898,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvvvvvv', $rw, $colMic, $colMac, $miyRw, $irwMac, $reserved, $grbit, $ixfe);
+        $data   = pack('vvvvvvvv', $rw, $colMic, $colMac, $miyRw, $irwMac, $reserved, $grbit, $ixfe);
 
         $this->_append($header.$data);
 
@@ -1921,16 +1921,16 @@ class writeexcel_worksheet extends writeexcel_biffwriter
      */
     public function _store_dimensions()
     {
-        $record = 0x0000;            // Record identifier
-        $length = 0x000A;            // Number of bytes to follow
-        $row_min = $this->_dim_rowmin;    // First row
-        $row_max = $this->_dim_rowmax;    // Last row plus 1
-        $col_min = $this->_dim_colmin;    // First column
-        $col_max = $this->_dim_colmax;    // Last column plus 1
+        $record   = 0x0000;            // Record identifier
+        $length   = 0x000A;            // Number of bytes to follow
+        $row_min  = $this->_dim_rowmin;    // First row
+        $row_max  = $this->_dim_rowmax;    // Last row plus 1
+        $col_min  = $this->_dim_colmin;    // First column
+        $col_max  = $this->_dim_colmax;    // Last column plus 1
         $reserved = 0x0000;            // Reserved by Excel
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvvv', $row_min, $row_max, $col_min, $col_max, $reserved);
+        $data   = pack('vvvvv', $row_min, $row_max, $col_min, $col_max, $reserved);
         $this->_prepend($header.$data);
     }
 
@@ -1942,23 +1942,23 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $record = 0x023E;    // Record identifier
         $length = 0x000A;    // Number of bytes to follow
 
-        $grbit = 0x00B6;    // Option flags
-        $rwTop = 0x0000;    // Top row visible in window
+        $grbit   = 0x00B6;    // Option flags
+        $rwTop   = 0x0000;    // Top row visible in window
         $colLeft = 0x0000;    // Leftmost column visible in window
-        $rgbHdr = 0x00000000;    // Row/column heading and gridline
+        $rgbHdr  = 0x00000000;    // Row/column heading and gridline
         // color
         // The options flags that comprise $grbit
-        $fDspFmla = 0;                        // 0 - bit
-        $fDspGrid = $this->_screen_gridlines;    // 1
-        $fDspRwCol = 1;                        // 2
-        $fFrozen = $this->_frozen;            // 3
-        $fDspZeros = 1;                        // 4
-        $fDefaultHdr = 1;                        // 5
-        $fArabic = 0;                        // 6
-        $fDspGuts = 1;                        // 7
+        $fDspFmla       = 0;                        // 0 - bit
+        $fDspGrid       = $this->_screen_gridlines;    // 1
+        $fDspRwCol      = 1;                        // 2
+        $fFrozen        = $this->_frozen;            // 3
+        $fDspZeros      = 1;                        // 4
+        $fDefaultHdr    = 1;                        // 5
+        $fArabic        = 0;                        // 6
+        $fDspGuts       = 1;                        // 7
         $fFrozenNoSplit = 0;                        // 0 - bit
-        $fSelected = $this->_selected;        // 1
-        $fPaged = 1;                        // 2
+        $fSelected      = $this->_selected;        // 1
+        $fPaged         = 1;                        // 2
 
         $grbit = $fDspFmla;
         $grbit |= $fDspGrid << 1;
@@ -1973,7 +1973,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $grbit |= $fPaged << 10;
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvV', $grbit, $rwTop, $colLeft, $rgbHdr);
+        $data   = pack('vvvV', $grbit, $rwTop, $colLeft, $rgbHdr);
 
         $this->_append($header.$data);
     }
@@ -1989,7 +1989,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $colwidth = 0x0008;    // Default column width
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $colwidth);
+        $data   = pack('v', $colwidth);
 
         $this->_prepend($header.$data);
     }
@@ -2008,15 +2008,15 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $length = 0x000B;        # Number of bytes to follow
 
         $colFirst = @$_[0] ? $_[0] : 0;    # First formatted column
-        $colLast = @$_[1] ? $_[1] : 0;    # Last formatted column
-        $coldx = @$_[2] ? $_[2] : 8.43;    # Col width, 8.43 is Excel default
+        $colLast  = @$_[1] ? $_[1] : 0;    # Last formatted column
+        $coldx    = @$_[2] ? $_[2] : 8.43;    # Col width, 8.43 is Excel default
 
         $coldx += 0.72;        # Fudge. Excel subtracts 0.72 !?
         $coldx *= 256;            # Convert to units of 1/256 of a char
         //$ixfe;					# XF index
-        $grbit = isset($_[4]) ? $_[4] : 0;    # Option flags
+        $grbit    = isset($_[4]) ? $_[4] : 0;    # Option flags
         $reserved = 0x00;            # Reserved
-        $format = @$_[3];        # Format object
+        $format   = @$_[3];        # Format object
         # Check for a format object
         if (isset($_[3])) {
             $ixfe = $format->get_xf_index();
@@ -2025,7 +2025,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvvvC', $colFirst, $colLast, $coldx, $ixfe, $grbit, $reserved);
+        $data   = pack('vvvvvC', $colFirst, $colLast, $coldx, $ixfe, $grbit, $reserved);
         $this->_prepend($header.$data);
     }
 
@@ -2039,16 +2039,16 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $record = 0x001D;                # Record identifier
         $length = 0x000F;                # Number of bytes to follow
 
-        $pnn = $this->_active_pane;    # Pane position
-        $rwAct = $_[0];                # Active row
-        $colAct = $_[1];                # Active column
+        $pnn     = $this->_active_pane;    # Pane position
+        $rwAct   = $_[0];                # Active row
+        $colAct  = $_[1];                # Active column
         $irefAct = 0;                    # Active cell ref
-        $cref = 1;                    # Number of refs
+        $cref    = 1;                    # Number of refs
 
-        $rwFirst = $_[0];                # First row in reference
+        $rwFirst  = $_[0];                # First row in reference
         $colFirst = $_[1];                # First col in reference
-        $rwLast = @$_[2] ? $_[2] : $rwFirst;    # Last  row in reference
-        $colLast = @$_[3] ? $_[3] : $colFirst;    # Last  col in reference
+        $rwLast   = @$_[2] ? $_[2] : $rwFirst;    # Last  row in reference
+        $colLast  = @$_[3] ? $_[3] : $colFirst;    # Last  col in reference
         # Swap last row/col for first row/col as necessary
         if ($rwFirst > $rwLast) {
             list($rwFirst, $rwLast) = array($rwLast, $rwFirst);
@@ -2059,7 +2059,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         $header = pack('vv', $record, $length);
-        $data = pack('CvvvvvvCC', $pnn, $rwAct, $colAct, $irefAct, $cref, $rwFirst, $rwLast, $colFirst, $colLast);
+        $data   = pack('CvvvvvvCC', $pnn, $rwAct, $colAct, $irefAct, $cref, $rwFirst, $rwLast, $colFirst, $colLast);
 
         $this->_append($header.$data);
     }
@@ -2082,7 +2082,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $length = 0x0002;    // Number of bytes to follow
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $cxals);
+        $data   = pack('v', $cxals);
 
         $this->_prepend($header.$data);
     }
@@ -2103,18 +2103,18 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         // references to external sheets.
         if ($this->_name == $sheetname) {
             $sheetname = '';
-            $length = 0x02;  // The following 2 bytes
-            $cch = 1;    // The following byte
-            $rgch = 0x02;  // Self reference
+            $length    = 0x02;  // The following 2 bytes
+            $cch       = 1;    // The following byte
+            $rgch      = 0x02;  // Self reference
         } else {
             $length = 0x02 + strlen($sheetname);
-            $cch = strlen($sheetname);
-            $rgch = 0x03;  // Reference to a sheet in the current
+            $cch    = strlen($sheetname);
+            $rgch   = 0x03;  // Reference to a sheet in the current
             // workbook
         }
 
         $header = pack('vv', $record, $length);
-        $data = pack('CC', $cch, $rgch);
+        $data   = pack('CC', $cch, $rgch);
 
         $this->_prepend($header.$data.$sheetname);
     }
@@ -2168,7 +2168,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             # The default column width is 8.43
             # The following slope and intersection values were interpolated.
             #
-      $y = 20 * $y + 255;
+      $y       = 20 * $y + 255;
             $x = 113.879 * $x + 390;
         }
 
@@ -2197,7 +2197,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $this->_active_pane = $pnnAct; # Used in _store_selection
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvvv', $x, $y, $rwTop, $colLeft, $pnnAct);
+        $data   = pack('vvvvv', $x, $y, $rwTop, $colLeft, $pnnAct);
 
         $this->_append($header.$data);
     }
@@ -2211,25 +2211,25 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $length = 0x0022;                // Number of bytes to follow
 
         $iPaperSize = $this->_paper_size;    // Paper size
-        $iScale = $this->_print_scale;    // Print scaling factor
+        $iScale     = $this->_print_scale;    // Print scaling factor
         $iPageStart = 0x01;                // Starting page number
-        $iFitWidth = $this->_fit_width;    // Fit to number of pages wide
+        $iFitWidth  = $this->_fit_width;    // Fit to number of pages wide
         $iFitHeight = $this->_fit_height;    // Fit to number of pages high
-        $grbit = 0x00;                // Option flags
-        $iRes = 0x0258;                // Print resolution
-        $iVRes = 0x0258;                // Vertical print resolution
-        $numHdr = $this->_margin_head;    // Header Margin
-        $numFtr = $this->_margin_foot;    // Footer Margin
-        $iCopies = 0x01;                // Number of copies
+        $grbit      = 0x00;                // Option flags
+        $iRes       = 0x0258;                // Print resolution
+        $iVRes      = 0x0258;                // Vertical print resolution
+        $numHdr     = $this->_margin_head;    // Header Margin
+        $numFtr     = $this->_margin_foot;    // Footer Margin
+        $iCopies    = 0x01;                // Number of copies
 
         $fLeftToRight = 0x0;                // Print over then down
-        $fLandscape = $this->_orientation;    // Page orientation
-        $fNoPls = 0x0;                // Setup not read from printer
-        $fNoColor = 0x0;                // Print black and white
-        $fDraft = 0x0;                // Print draft quality
-        $fNotes = 0x0;                // Print notes
-        $fNoOrient = 0x0;                // Orientation not set
-        $fUsePage = 0x0;                // Use custom starting page
+        $fLandscape   = $this->_orientation;    // Page orientation
+        $fNoPls       = 0x0;                // Setup not read from printer
+        $fNoColor     = 0x0;                // Print black and white
+        $fDraft       = 0x0;                // Print draft quality
+        $fNotes       = 0x0;                // Print notes
+        $fNoOrient    = 0x0;                // Orientation not set
+        $fUsePage     = 0x0;                // Use custom starting page
 
         $grbit = $fLeftToRight;
         $grbit |= $fLandscape << 1;
@@ -2249,9 +2249,9 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         $header = pack('vv', $record, $length);
-        $data1 = pack('vvvvvvvv', $iPaperSize, $iScale, $iPageStart, $iFitWidth, $iFitHeight, $grbit, $iRes, $iVRes);
-        $data2 = $numHdr.$numFtr;
-        $data3 = pack('v', $iCopies);
+        $data1  = pack('vvvvvvvv', $iPaperSize, $iScale, $iPageStart, $iFitWidth, $iFitHeight, $grbit, $iRes, $iVRes);
+        $data2  = $numHdr.$numFtr;
+        $data3  = pack('v', $iCopies);
 
         $this->_prepend($header.$data1.$data2.$data3);
     }
@@ -2263,12 +2263,12 @@ class writeexcel_worksheet extends writeexcel_biffwriter
     {
         $record = 0x0014;        // Record identifier
 
-        $str = $this->_header;    // header string
-        $cch = strlen($str);    // Length of header string
+        $str    = $this->_header;    // header string
+        $cch    = strlen($str);    // Length of header string
         $length = 1 + $cch;        // Bytes to follow
 
         $header = pack('vv', $record, $length);
-        $data = pack('C', $cch);
+        $data   = pack('C', $cch);
 
         $this->_append($header.$data.$str);
     }
@@ -2280,12 +2280,12 @@ class writeexcel_worksheet extends writeexcel_biffwriter
     {
         $record = 0x0015;        // Record identifier
 
-        $str = $this->_footer;    // Footer string
-        $cch = strlen($str);    // Length of footer string
+        $str    = $this->_footer;    // Footer string
+        $cch    = strlen($str);    // Length of footer string
         $length = 1 + $cch;        // Bytes to follow
 
         $header = pack('vv', $record, $length);
-        $data = pack('C', $cch);
+        $data   = pack('C', $cch);
 
         $this->_append($header.$data.$str);
     }
@@ -2301,7 +2301,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $fHCenter = $this->_hcenter;    // Horizontal centering
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $fHCenter);
+        $data   = pack('v', $fHCenter);
 
         $this->_append($header.$data);
     }
@@ -2317,7 +2317,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $fVCenter = $this->_vcenter;    // Horizontal centering
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $fVCenter);
+        $data   = pack('v', $fVCenter);
 
         $this->_append($header.$data);
     }
@@ -2333,7 +2333,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $margin = $this->_margin_left;    // Margin in inches
 
         $header = pack('vv', $record, $length);
-        $data = pack('d', $margin);
+        $data   = pack('d', $margin);
 
         if ($this->_byte_order) {
             $data = strrev($data);
@@ -2353,7 +2353,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $margin = $this->_margin_right;    // Margin in inches
 
         $header = pack('vv', $record, $length);
-        $data = pack('d', $margin);
+        $data   = pack('d', $margin);
 
         if ($this->_byte_order) {
             $data = strrev($data);
@@ -2373,7 +2373,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $margin = $this->_margin_top;    // Margin in inches
 
         $header = pack('vv', $record, $length);
-        $data = pack('d', $margin);
+        $data   = pack('d', $margin);
 
         if ($this->_byte_order) {
             $data = strrev($data);
@@ -2393,7 +2393,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $margin = $this->_margin_bottom;    // Margin in inches
 
         $header = pack('vv', $record, $length);
-        $data = pack('d', $margin);
+        $data   = pack('d', $margin);
 
         if ($this->_byte_order) {
             $data = strrev($data);
@@ -2420,11 +2420,11 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $record = 0x00E5;                # Record identifier
         $length = 0x000A;                # Bytes to follow
 
-        $cref = 1;                    # Number of refs
-        $rwFirst = $_[0];                # First row in reference
+        $cref     = 1;                    # Number of refs
+        $rwFirst  = $_[0];                # First row in reference
         $colFirst = $_[1];                # First col in reference
-        $rwLast = $_[2] ? $_[2] : $rwFirst;    # Last  row in reference
-        $colLast = $_[3] ? $_[3] : $colFirst;    # Last  col in reference
+        $rwLast   = $_[2] ? $_[2] : $rwFirst;    # Last  row in reference
+        $colLast  = $_[3] ? $_[3] : $colFirst;    # Last  col in reference
         // Swap last row/col for first row/col as necessary
         if ($rwFirst > $rwLast) {
             list($rwFirst, $rwLast) = array($rwLast, $rwFirst);
@@ -2435,7 +2435,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         $header = pack('vv', $record, $length);
-        $data = pack('vvvvv', $cref, $rwFirst, $rwLast, $colFirst, $colLast);
+        $data   = pack('vvvvv', $cref, $rwFirst, $rwLast, $colFirst, $colLast);
 
         $this->_append($header.$data);
     }
@@ -2451,7 +2451,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $fPrintRwCol = $this->_print_headers;    // Boolean flag
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $fPrintRwCol);
+        $data   = pack('v', $fPrintRwCol);
 
         $this->_prepend($header.$data);
     }
@@ -2468,7 +2468,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $fPrintGrid = $this->_print_gridlines;    // Boolean flag
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $fPrintGrid);
+        $data   = pack('v', $fPrintGrid);
 
         $this->_prepend($header.$data);
     }
@@ -2485,7 +2485,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $fGridSet = !$this->_print_gridlines;    // Boolean flag
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $fGridSet);
+        $data   = pack('v', $fGridSet);
 
         $this->_prepend($header.$data);
     }
@@ -2508,7 +2508,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $grbit);
+        $data   = pack('v', $grbit);
 
         $this->_prepend($header.$data);
     }
@@ -2527,11 +2527,11 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $breaks = $this->_sort_pagebreaks($this->_hbreaks);
 
         $record = 0x001b;            // Record identifier
-        $cbrk = sizeof($breaks);    // Number of page breaks
+        $cbrk   = sizeof($breaks);    // Number of page breaks
         $length = ($cbrk + 1) * 2;    // Bytes to follow
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $cbrk);
+        $data   = pack('v', $cbrk);
 
         // Append each page break
         foreach ($breaks as $break) {
@@ -2555,11 +2555,11 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $breaks = $this->_sort_pagebreaks($this->_vbreaks);
 
         $record = 0x001a;            // Record identifier
-        $cbrk = sizeof($breaks);    // Number of page breaks
+        $cbrk   = sizeof($breaks);    // Number of page breaks
         $length = ($cbrk + 1) * 2;    // Bytes to follow
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $cbrk);
+        $data   = pack('v', $cbrk);
 
         // Append each page break
         foreach ($breaks as $break) {
@@ -2586,7 +2586,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $fLock = $this->_protect;    // Worksheet is protected
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $fLock);
+        $data   = pack('v', $fLock);
 
         $this->_prepend($header.$data);
     }
@@ -2607,7 +2607,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $wPassword = $this->_password;    // Encoded password
 
         $header = pack('vv', $record, $length);
-        $data = pack('v', $wPassword);
+        $data   = pack('v', $wPassword);
 
         $this->_prepend($header.$data);
     }
@@ -2627,11 +2627,11 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             $_ = $this->_substitute_cellref($_);
         }
 
-        $row = $_[0];
-        $col = $_[1];
-        $bitmap = $_[2];
-        $x = $_[3] ? $_[3] : 0;
-        $y = $_[4] ? $_[4] : 0;
+        $row     = $_[0];
+        $col     = $_[1];
+        $bitmap  = $_[2];
+        $x       = $_[3] ? $_[3] : 0;
+        $y       = $_[4] ? $_[4] : 0;
         $scale_x = $_[5] ? $_[5] : 1;
         $scale_y = $_[6] ? $_[6] : 1;
 
@@ -2647,9 +2647,9 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         # Write the IMDATA record to store the bitmap data
         $record = 0x007f;
         $length = 8 + $size;
-        $cf = 0x09;
-        $env = 0x01;
-        $lcb = $size;
+        $cf     = 0x09;
+        $env    = 0x01;
+        $lcb    = $size;
 
         $header = pack('vvvvV', $record, $length, $cf, $env, $lcb);
 
@@ -2726,7 +2726,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             $y1 = 0;
         }
 
-        $width = $width + $x1 - 1;
+        $width  = $width + $x1 - 1;
         $height = $height + $y1 - 1;
 
         // Subtract the underlying cell widths to find the end cell of the
@@ -2817,45 +2817,45 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $record = 0x005d;    // Record identifier
         $length = 0x003c;    // Bytes to follow
 
-        $cObj = 0x0001;    // Count of objects in file (set to 1)
-        $OT = 0x0008;    // Object type. 8 = Picture
-        $id = 0x0001;    // Object ID
+        $cObj  = 0x0001;    // Count of objects in file (set to 1)
+        $OT    = 0x0008;    // Object type. 8 = Picture
+        $id    = 0x0001;    // Object ID
         $grbit = 0x0614;    // Option flags
 
         $colL = $col_start;    // Col containing upper left corner of object
-        $dxL = $x1;        // Distance from left side of cell
+        $dxL  = $x1;        // Distance from left side of cell
 
         $rwT = $row_start;    // Row containing top left corner of object
         $dyT = $y1;        // Distance from top of cell
 
         $colR = $col_end;    // Col containing lower right corner of object
-        $dxR = $x2;        // Distance from right of cell
+        $dxR  = $x2;        // Distance from right of cell
 
         $rwB = $row_end;    // Row containing bottom right corner of object
         $dyB = $y2;        // Distance from bottom of cell
 
-        $cbMacro = 0x0000;    // Length of FMLA structure
+        $cbMacro   = 0x0000;    // Length of FMLA structure
         $Reserved1 = 0x0000;    // Reserved
         $Reserved2 = 0x0000;    // Reserved
 
-        $icvBack = 0x09;        // Background colour
-        $icvFore = 0x09;        // Foreground colour
-        $fls = 0x00;        // Fill pattern
-        $fAuto = 0x00;        // Automatic fill
-        $icv = 0x08;        // Line colour
-        $lns = 0xff;        // Line style
-        $lnw = 0x01;        // Line weight
-        $fAutoB = 0x00;        // Automatic border
-        $frs = 0x0000;    // Frame style
-        $cf = 0x0009;    // Image format, 9 = bitmap
-        $Reserved3 = 0x0000;    // Reserved
+        $icvBack    = 0x09;        // Background colour
+        $icvFore    = 0x09;        // Foreground colour
+        $fls        = 0x00;        // Fill pattern
+        $fAuto      = 0x00;        // Automatic fill
+        $icv        = 0x08;        // Line colour
+        $lns        = 0xff;        // Line style
+        $lnw        = 0x01;        // Line weight
+        $fAutoB     = 0x00;        // Automatic border
+        $frs        = 0x0000;    // Frame style
+        $cf         = 0x0009;    // Image format, 9 = bitmap
+        $Reserved3  = 0x0000;    // Reserved
         $cbPictFmla = 0x0000;    // Length of FMLA structure
-        $Reserved4 = 0x0000;    // Reserved
-        $grbit2 = 0x0001;    // Option flags
-        $Reserved5 = 0x0000;    // Reserved
+        $Reserved4  = 0x0000;    // Reserved
+        $grbit2     = 0x0001;    // Option flags
+        $Reserved5  = 0x0000;    // Reserved
 
         $header = pack('vv', $record, $length);
-        $data = pack('V', $cObj);
+        $data   = pack('V', $cObj);
         $data .= pack('v', $OT);
         $data .= pack('v', $id);
         $data .= pack('v', $grbit);
@@ -2921,17 +2921,17 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         // Read and remove the bitmap size. This is more reliable than reading
         // the data size at offset 0x22.
         $array = unpack('Vsize', $data);
-        $data = substr($data, 4);
-        $size = $array['size'];
+        $data  = substr($data, 4);
+        $size  = $array['size'];
         $size -= 0x36;    # Subtract size of bitmap header.
         $size += 0x0C;    # Add size of BIFF header.
         // Remove bitmap data: reserved, offset, header length.
         $data = substr($data, 12);
 
         // Read and remove the bitmap width and height. Verify the sizes.
-        $array = unpack('Vwidth/Vheight', $data);
-        $data = substr($data, 8);
-        $width = $array['width'];
+        $array  = unpack('Vwidth/Vheight', $data);
+        $data   = substr($data, 8);
+        $width  = $array['width'];
         $height = $array['height'];
 
         if ($width > 0xFFFF) {
@@ -2943,9 +2943,9 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         // Read and remove the bitmap planes and bpp data. Verify them.
-        $array = unpack('vplanes/vbitcount', $data);
-        $data = substr($data, 4);
-        $planes = $array['planes'];
+        $array    = unpack('vplanes/vbitcount', $data);
+        $data     = substr($data, 4);
+        $planes   = $array['planes'];
         $bitcount = $array['bitcount'];
 
         if ($bitcount != 24) {
@@ -2957,8 +2957,8 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         }
 
         // Read and remove the bitmap compression. Verify compression.
-        $array = unpack('Vcompression', $data);
-        $data = substr($data, 4);
+        $array       = unpack('Vcompression', $data);
+        $data        = substr($data, 4);
         $compression = $array['compression'];
 
         if ($compression != 0) {
@@ -2970,7 +2970,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         // Add the BITMAPCOREHEADER data
         $header = pack('Vvvvv', 0x000c, $width, $height, 0x01, 0x18);
-        $data = $header.$data;
+        $data   = $header.$data;
 
         return array($width, $height, $size, $data);
     }
@@ -2990,7 +2990,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $length = 0x0004; // Bytes to follow
 
         $header = pack('vv', $record, $length);
-        $data = pack('vv', $this->_zoom, 100);
+        $data   = pack('vv', $this->_zoom, 100);
 
         $this->_append($header.$data);
     }
