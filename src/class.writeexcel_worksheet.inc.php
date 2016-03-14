@@ -29,7 +29,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 {
 
     public $_name;
-    protected $_index;
+    public $_index;
     protected $_activesheet;
     protected $_firstsheet;
     protected $_url_format;
