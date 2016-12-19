@@ -24,13 +24,8 @@
     },
     "autoload": {
         "psr-0": { },
-        "files": [
-            "src/class.writeexcel_biffwriter.inc.php",
-            "src/class.writeexcel_format.inc.php",
-            "src/class.writeexcel_formula.inc.php",
-            "src/class.writeexcel_olewriter.inc.php",
-            "src/class.writeexcel_workbook.inc.php",
-            "src/class.writeexcel_worksheet.inc.php"
+        "classmap": [
+            "src"
         ]
     }
 }
