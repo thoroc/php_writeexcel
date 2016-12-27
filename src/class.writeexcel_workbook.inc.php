@@ -81,7 +81,7 @@ class writeexcel_workbook extends writeexcel_biffwriter
                 }
             }
         }
-        $this->_debug = @$options['debug'];
+        $this->_debug = isset($options['debug']) ? $options['debug'] : false;
         $this->_debug && error_log(__METHOD__.' options: '.print_r($options, 1));
         $filename = @$options['filename'];
         if (is_null($filename)) {
