@@ -99,7 +99,7 @@ class writeexcel_formula
      *
      * Constructor
      */
-    public function writeexcel_formula($byte_order)
+    public function __construct($byte_order)
     {
         $this->parser         = false;
         $this->ptg            = array();
