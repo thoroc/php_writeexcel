@@ -18,9 +18,6 @@
  * Free Software Foundation, Inc., 59 Temple Place,
  * Suite 330, Boston, MA  02111-1307 USA
  */
-require_once 'class.writeexcel_workbook.inc.php';
-require_once 'class.ole_pps_root.php';
-require_once 'class.ole_pps_file.php';
 
 /**
  * This is the Spreadsheet::WriteExcel Perl package ported to PHP
