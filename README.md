@@ -27,7 +27,7 @@ Example for your `composer.json` file:
     ],
     "require": {
         "thoroc/php_ole": "master",
-        "thoroc/php_writeexcel": "master",
+        "thoroc/php_writeexcel": "master"
     }
 }
 ```
