@@ -25,11 +25,6 @@
  */
 class writeexcel_workbookbig extends writeexcel_workbook
 {
-    public function writeexcel_workbookbig($filename)
-    {
-        $this->writeexcel_workbook($filename);
-    }
-
     public function _store_OLE_file()
     {
         $file = new ole_pps_file(asc2ucs('Book'));

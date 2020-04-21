@@ -92,9 +92,9 @@ class writeexcel_worksheet extends writeexcel_biffwriter
     /**
      * Constructor. Creates a new Worksheet object from a BIFFwriter object.
      */
-    public function writeexcel_worksheet($name, $index, &$activesheet, &$firstsheet, &$url_format, &$parser, $tempdir)
+    public function __construct($name, $index, &$activesheet, &$firstsheet, &$url_format, &$parser, $tempdir)
     {
-        $this->writeexcel_biffwriter();
+        parent::__construct();
 
         $rowmax = 65536; // 16384 in Excel 5
         $colmax = 256;
@@ -311,7 +311,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
     /**
      * get_data().
-     * 
+     *
      * Retrieves data from memory in one chunk, or from disk in $buffer
      * sized chunks.
      */
@@ -642,7 +642,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
     /**
      * repeat_rows($first_row, $last_row).
-     * 
+     *
      * Set the rows to repeat at the top of each printed page. See also the
      * _store_name_xxxx() methods in Workbook.pm.
      */
@@ -656,7 +656,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
     /**
      * repeat_columns($first_col, $last_col).
-     * 
+     *
      * Set the columns to repeat at the left hand side of each printed page.
      * See also the _store_names() methods in Workbook.pm.
      */
@@ -675,7 +675,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
     /**
      * print_area($first_row, $first_col, $last_row, $last_col).
-     * 
+     *
      * Set the area of each worksheet that will be printed. See also the
      * _store_names() methods in Workbook.pm.
      */
@@ -767,7 +767,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         // Confine the scale to Excel's range
         if ($scale < 10 || $scale > 400) {
             trigger_error("Zoom factor $scale outside range: ".
-                    '10 <= zoom <= 400', E_USER_WARNING);
+                          '10 <= zoom <= 400', E_USER_WARNING);
             $scale = 100;
         }
 
@@ -782,7 +782,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         // Confine the scale to Excel's range
         if ($scale < 10 || $scale > 400) {
             trigger_error("Print scale $scale outside range: ".
-                    '10 <= zoom <= 400', E_USER_WARNING);
+                          '10 <= zoom <= 400', E_USER_WARNING);
             $scale = 100;
         }
 
@@ -794,10 +794,10 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
     /**
      * write($row, $col, $token, $format).
-     * 
+     *
      * Parse $token call appropriate write method. $row and $column are zero
      * indexed. $format is optional.
-     * 
+     *
      * Returns: return value of called subroutine
      */
     public function write()
@@ -968,7 +968,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
     {
         if (func_num_args() > 1) {
             trigger_error('writeexcel_worksheet::_append() '.
-                    'called with more than one argument', E_USER_ERROR);
+                          'called with more than one argument', E_USER_ERROR);
         }
 
         if ($this->_using_tmpfile) {
@@ -1167,7 +1167,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $col = $_[1];                        # Zero indexed column
         $num = $_[2];
         //!!!
-        $xf = $this->_XF($row, $col, @$_[3]); # The cell format
+        $xf = $this->_XF($row, $col, isset($_[3])?$_[3]:false); # The cell format
         # Check that row and col are valid and store max and min values
         if ($row >= $this->_xls_rowmax) {
             return -2;
@@ -1234,7 +1234,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $col    = $_[1];                        # Zero indexed column
         $strlen = strlen($_[2]);
         $str    = $_[2];
-        $xf     = $this->_XF($row, $col, @$_[3]); # The cell format
+        $xf     = $this->_XF($row, $col, isset($_[3])?$_[3]:false); # The cell format
 
         $str_error = 0;
 
@@ -1379,7 +1379,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         # we set $num to zero and set the option flags in $grbit to ensure
         # automatic calculation of the formula when the file is opened.
         #
-          $xf  = $this->_XF($row, $col, @$_[3]); # The cell format
+        $xf  = $this->_XF($row, $col, @$_[3]); # The cell format
         $num   = 0x00;                        # Current value of formula
         $grbit = 0x03;                        # Option flags
         $chn   = 0x0000;                        # Must be zero
@@ -1556,12 +1556,12 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         # Write the packed data
         $this->_append($header.
-                $data.
-                $unknown1.
-                $options.
-                $unknown2.
-                $url_len.
-                $url);
+                       $data.
+                       $unknown1.
+                       $options.
+                       $unknown2.
+                       $url_len.
+                       $url);
 
         return $str_error;
     }
@@ -1624,11 +1624,11 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         # Write the packed data
         $this->_append($header.
-                $data.
-                $unknown1.
-                $options.
-                $url_len.
-                $url);
+                       $data.
+                       $unknown1.
+                       $options.
+                       $url_len.
+                       $url);
 
         return $str_error;
     }
@@ -1668,7 +1668,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $xf = $_[6] ? $_[6] : $this->_url_format;  # The cell format
         # Strip URL type and change Unix dir separator to Dos style (if needed)
         #
-          $url = preg_replace('[^external:]', '', $url);
+        $url = preg_replace('[^external:]', '', $url);
         $url   = preg_replace('[/]', '\\', $url);
 
         # Write the visible label
@@ -1685,7 +1685,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         #	relative if link starts with up-dir, "..\..\somefile.xls"
         #	otherwise, absolute
         #
-          $absolute = 0x02; # Bit mask
+        $absolute = 0x02; # Bit mask
 
         if (!preg_match('[\\]', $url)) {
             $absolute = 0x00;
@@ -1699,7 +1699,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         # parameters accordingly.
         # Split the dir name and sheet name (if it exists)
         #
-          list($dir_long, $sheet) = preg_split('/\#/', $url);
+        list($dir_long, $sheet) = preg_split('/\#/', $url);
         $link_type                = 0x01 | $absolute;
 
         //!!!
@@ -1742,19 +1742,19 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         # Pack the main data stream
         $data = pack('vvvv', $row1, $row2, $col1, $col2).
-                $unknown1.
-                $link_type.
-                $unknown2.
-                $up_count.
-                $dir_short_len.
-                $dir_short.
-                $unknown3.
-                $stream_len.
-                $dir_long_len.
-                $unknown4.
-                $dir_long.
-                $sheet_len.
-                $sheet;
+            $unknown1.
+            $link_type.
+            $unknown2.
+            $up_count.
+            $dir_short_len.
+            $dir_short.
+            $unknown3.
+            $stream_len.
+            $dir_long_len.
+            $unknown4.
+            $dir_long.
+            $sheet_len.
+            $sheet;
 
         # Pack the header data
         $length = strlen($data);
@@ -1792,7 +1792,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         $xf = $_[6] ? $_[6] : $this->_url_format;  # The cell format
         # Strip URL type and change Unix dir separator to Dos style (if needed)
         #
-      $url   = preg_replace('[^external:]', '', $url);
+        $url   = preg_replace('[^external:]', '', $url);
         $url = preg_replace('[/]', '\\');
 
         # Write the visible label
@@ -1840,12 +1840,12 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         # Pack the main data stream
         $data = pack('vvvv', $row1, $row2, $col1, $col2).
-                $unknown1.
-                $link_type.
-                $dir_long_len.
-                $dir_long.
-                $sheet_len.
-                $sheet;
+            $unknown1.
+            $link_type.
+            $dir_long_len.
+            $dir_long.
+            $sheet_len.
+            $sheet;
 
         # Pack the header data
         $length = strlen($data);
@@ -2046,8 +2046,8 @@ class writeexcel_worksheet extends writeexcel_biffwriter
 
         $rwFirst  = $_[0];                # First row in reference
         $colFirst = $_[1];                # First col in reference
-        $rwLast   = @$_[2] ? $_[2] : $rwFirst;    # Last  row in reference
-        $colLast  = @$_[3] ? $_[3] : $colFirst;    # Last  col in reference
+        $rwLast   = isset($_[2]) && !empty($_[2]) ? $_[2] : $rwFirst;    # Last  row in reference
+        $colLast  = isset($_[3]) && !empty($_[3]) ? $_[3] : $colFirst;    # Last  col in reference
         # Swap last row/col for first row/col as necessary
         if ($rwFirst > $rwLast) {
             list($rwFirst, $rwLast) = array($rwLast, $rwFirst);
@@ -2167,15 +2167,15 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             # The default column width is 8.43
             # The following slope and intersection values were interpolated.
             #
-      $y       = 20 * $y + 255;
+            $y       = 20 * $y + 255;
             $x = 113.879 * $x + 390;
         }
 
         # Determine which pane should be active. There is also the undocumented
         # option to override this should it be necessary: may be removed later.
         #
-      if (!isset($pnnAct)) {
-          # Bottom right
+        if (!isset($pnnAct)) {
+            # Bottom right
             if ($x != 0 && $y != 0) {
                 $pnnAct = 0;
             }
@@ -2191,7 +2191,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
             if ($x == 0 && $y == 0) {
                 $pnnAct = 3;
             }
-      }
+        }
 
         $this->_active_pane = $pnnAct; # Used in _store_selection
 
@@ -2911,7 +2911,7 @@ class writeexcel_worksheet extends writeexcel_biffwriter
         // The first 2 bytes are used to identify the bitmap.
         if (substr($data, 0, 2) != 'BM') {
             trigger_error("$bitmap doesn't appear to to be a ".
-                    'valid bitmap image.', E_USER_ERROR);
+                          'valid bitmap image.', E_USER_ERROR);
         }
 
         // Remove bitmap data: ID.
